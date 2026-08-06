@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Build the Activity Diagram</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+  :root{
+    --navy:#0A0A0D;
+    --navy-soft:#14161B;
+    --navy-soft2:#1B1E25;
+    --cyan:#2BB4E0;
+    --cyan-soft:#B9E7F5;
+    --cyan-faint:#E7F6FC;
+    --paper:#F7F8FA;
+    --card:#FFFFFF;
+    --line:#E2E5EA;
+    --ink:#14171C;
+    --ink-muted:#5B6472;
+    --danger:#D64545;
+    --danger-bg:#FBEAEA;
+    --success:#1F9D55;
+    --success-bg:#E7F7ED;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:'Inter',-apple-system,Helvetica,Arial,sans-serif;
+    background:var(--navy);
+    color:var(--ink);
+  }
+  button,input{font:inherit}
+  button{cursor:pointer}
+  h1,h2,h3,p{margin:0}
+
+  .app{ max-width:1440px; margin:0 auto; padding:0 0 32px; }
+
+  .topbar{
+    background:var(--navy-soft);
+    border-bottom:2px solid var(--cyan);
+    padding:15px 24px;
+    display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.08em;
+    color:var(--cyan); text-transform:uppercase; margin-bottom:4px;
+  }
+  h1{
+    font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:21px;
+    color:#FFFFFF; text-transform:uppercase; letter-spacing:0.01em;
+  }
+  .subtitle{ margin-top:4px; color:var(--cyan-soft); font-size:12.5px; max-width:580px; line-height:1.5; }
+  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+
+  .btn{
+    border:1.5px solid var(--line); background:var(--card); color:var(--ink);
+    padding:8px 14px; border-radius:8px; font-weight:600; font-size:12.5px;
+    transition:transform .12s ease, border-color .12s ease;
+  }
+  .btn:hover{ border-color:var(--cyan); transform:translateY(-1px); }
+  .btn:active{ transform:translateY(0) scale(.98); }
+  .btn.primary{ background:var(--cyan); color:#062230; border-color:var(--cyan); }
+  .btn.ghost{ background:transparent; color:#E7ECF1; border-color:#333944; }
+  .btn.ghost:hover{ border-color:var(--cyan); }
+  .btn.full{width:100%}
+  .btn.small{ padding:6px 10px; font-size:11.5px; }
+  .btn:disabled{ opacity:.4; cursor:not-allowed; transform:none; }
+
+  .badge{
+    display:inline-flex; align-items:center; gap:6px; padding:6px 11px;
+    border-radius:999px; background:var(--cyan-faint); color:#0E5C79;
+    font-size:11.5px; font-weight:700; font-family:'IBM Plex Mono',monospace;
+  }
+
+  .content{ padding:18px 24px 0; background:var(--paper); }
+  .layout{ display:grid; grid-template-columns:220px 1fr; gap:16px; align-items:start; }
+
+  .card{ background:var(--card); border:1px solid var(--line); border-radius:12px; padding:13px; }
+  .sidebar{display:flex;flex-direction:column;gap:13px}
+  .sidebar h3{ font-family:'Barlow Condensed',sans-serif; font-size:15px; font-weight:700; text-transform:uppercase; }
+
+  .legend{display:grid;gap:8px;font-size:12.5px;margin-top:8px}
+  .legend-row{display:flex;gap:9px;align-items:center}
+  .symbol{ flex-shrink:0; border:1.5px solid var(--ink); }
+  .symbol.action{width:26px;height:16px;border-radius:4px}
+  .symbol.initial{width:13px;height:13px;border-radius:50%;background:var(--ink);border:none}
+  .symbol.decision{width:14px;height:14px;background:var(--ink);clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%);border:none}
+  .symbol.final{width:14px;height:14px;border-radius:50%;position:relative}
+  .symbol.final::after{content:"";position:absolute;inset:2.5px;border-radius:50%;background:var(--ink)}
+
+  .section-rule{border-top:1px solid var(--line);padding-top:11px}
+  .stack{display:grid;gap:7px}
+  .help{font-size:11.5px;color:var(--ink-muted);line-height:1.5}
+
+  .workspace-wrap{display:grid;gap:8px}
+  .workspace-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+  #workspace{
+    position:relative; min-height:560px; overflow:hidden;
+    border:1px solid var(--line); border-radius:12px; background:var(--card);
+    background-image:radial-gradient(var(--line) 1px, transparent 1px);
+    background-size:28px 28px;
+    touch-action:none;
+  }
+  #connectionLayer,#nodeLayer{position:absolute;inset:0;width:100%;height:100%}
+  #nodeLayer{pointer-events:none}
+  .builder-node{pointer-events:auto}
+  #connectionLayer{pointer-events:none}
+  #connectionLayer path.edge-line{pointer-events:stroke;cursor:pointer}
+  #connectionLayer path.answer-line{pointer-events:none}
+
+  .builder-node{
+    position:absolute; display:flex; align-items:center; justify-content:center;
+    width:126px; min-height:42px; padding:7px 10px;
+    border:1.5px solid var(--ink); border-radius:9px;
+    background:var(--card); color:var(--ink); text-align:center;
+    font-size:12.5px; font-weight:500; line-height:1.25;
+    user-select:none; z-index:2;
+    transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+  }
+  .builder-node .body{cursor:grab}
+  .builder-node:hover{ transform:scale(1.03); box-shadow:0 3px 10px rgba(10,10,13,0.08); }
+  .builder-node.dragging{cursor:grabbing; box-shadow:0 6px 16px rgba(10,10,13,0.14);}
+  .builder-node.correct{ border-color:var(--success); background:var(--success-bg); }
+  .builder-node.wrong{ border-color:var(--danger); background:var(--danger-bg); }
+
+  .builder-node.initial,.builder-node.final{
+    width:38px; min-height:38px; padding:0; border-radius:999px;
+  }
+  .builder-node.initial{background:var(--ink);color:#fff;font-size:10.5px}
+  .builder-node.final::after{
+    content:""; width:18px; height:18px; border-radius:999px; background:var(--ink);
+  }
+  .builder-node.decision{
+    width:64px; height:64px; min-height:64px; border:none; background:transparent; padding:0;
+  }
+  .builder-node.merge{
+    width:34px; height:34px; min-height:34px; border:none; background:transparent; padding:0;
+  }
+  .diamond-shape{ position:absolute; inset:0; z-index:0; }
+  .diamond-shape polygon{ fill:var(--card); stroke:var(--ink); stroke-width:2; vector-effect:non-scaling-stroke; }
+  .builder-node.correct .diamond-shape polygon{ stroke:var(--success); fill:var(--success-bg); }
+  .builder-node.wrong .diamond-shape polygon{ stroke:var(--danger); fill:var(--danger-bg); }
+  .builder-node .body{ position:relative; z-index:1; }
+  .node-caption{
+    position:absolute; top:100%; left:50%; transform:translateX(-50%);
+    margin-top:5px; width:104px; text-align:center; pointer-events:none;
+    font-size:12px; color:var(--ink); line-height:1.25; z-index:1;
+  }
+
+  .status-icon{
+    position:absolute; top:-9px; right:-9px; width:20px; height:20px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700;
+    color:#fff; z-index:3;
+  }
+  .status-icon.correct{background:var(--success)}
+  .status-icon.wrong{background:var(--danger)}
+
+  .handle{
+    position:absolute; width:9px; height:9px; border-radius:50%;
+    background:var(--cyan); border:1.5px solid #fff; opacity:.28;
+    cursor:crosshair; z-index:4; transition:opacity .12s ease, transform .12s ease;
+  }
+  .builder-node:hover .handle{ opacity:.85; }
+  .handle:hover{ transform:scale(1.5); opacity:1; }
+  .handle.top{top:-5px;left:calc(50% - 4.5px)}
+  .handle.bottom{bottom:-5px;left:calc(50% - 4.5px)}
+  .handle.left{left:-5px;top:calc(50% - 4.5px)}
+  .handle.right{right:-5px;top:calc(50% - 4.5px)}
+
+  .edge-line{ fill:none; stroke:var(--ink); stroke-width:2.2; marker-end:url(#builderArrow); }
+  .edge-line:hover{ stroke:var(--danger); stroke-width:3; }
+  .edge-line.removing{ stroke:var(--danger); }
+  .edge-label{ fill:#0E5C79; font-size:12.5px; font-weight:700; font-family:'IBM Plex Mono',monospace; }
+  .answer-line{ fill:none; stroke:var(--success); stroke-width:2; stroke-dasharray:2,5; }
+  .drag-line{ fill:none; stroke:var(--cyan); stroke-width:2.2; stroke-dasharray:2,5; }
+
+  .hint-text{ font-size:12.5px; color:var(--ink-muted); }
+  .helper-strip{ display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; font-size:12.5px; color:var(--ink-muted); }
+
+  .feedback{
+    margin-top:12px; padding:11px 14px; border-radius:10px;
+    background:var(--card); border:1px solid var(--line); border-left:3px solid var(--cyan);
+    font-size:13px;
+  }
+  .feedback.correct{ border-left-color:var(--success); background:var(--success-bg); }
+  .feedback.wrong{ border-left-color:var(--danger); background:var(--danger-bg); }
+  .feedback p+p{margin-top:5px;color:var(--ink-muted);font-size:12.5px;line-height:1.5}
+  .feedback-head{ display:flex; align-items:center; gap:8px; font-weight:700; font-size:13px; }
+
+  .metrics{
+    margin:12px 0 20px; padding:10px 14px; display:flex; gap:22px; flex-wrap:wrap;
+    background:var(--card); border:1px solid var(--line); border-radius:10px;
+  }
+  .metric{ display:flex; align-items:baseline; gap:6px; }
+  .metric-label{ font-size:11px; color:var(--ink-muted); font-family:'IBM Plex Mono',monospace; text-transform:uppercase; }
+  .metric-value{ font-size:14px; font-weight:700; font-family:'Barlow Condensed',sans-serif; }
+
+  dialog{ border:1px solid var(--line); border-radius:16px; padding:0; background:var(--card); color:var(--ink); }
+  dialog::backdrop{background:rgba(10,10,13,.55)}
+  .dialog-body{width:min(92vw,400px);padding:22px;display:grid;gap:16px}
+  label{display:grid;gap:6px;font-weight:600;font-size:13.5px}
+  input[type="password"]{
+    width:100%; border:1.5px solid var(--line); border-radius:9px;
+    padding:10px 12px; background:var(--paper); color:var(--ink);
+  }
+  input[type="password"]:focus{ outline:2px solid var(--cyan); outline-offset:1px; border-color:var(--cyan); }
+  .error{color:var(--danger);font-size:13px;min-height:1.2em}
+  .dialog-actions{display:flex;justify-content:flex-end;gap:8px}
+
+  @media(max-width:900px){
+    .layout{grid-template-columns:1fr}
+    #workspace{min-height:600px}
+  }
+  @media(max-width:640px){
+    .topbar,.content{padding-left:16px;padding-right:16px}
+    .metrics{flex-direction:column;gap:8px}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="topbar">
+    <div>
+      <div class="eyebrow">SYS 611 &middot; Diagram Builder</div>
+      <h1>Reconstruct the penalty-kick process</h1>
+      <p class="subtitle">Drag from the small dots on each block's edge to connect it to another block. Assessment is based on the direction and logic of your connections &mdash; layout doesn't matter.</p>
+    </div>
+    <div class="row">
+      <span class="badge" id="connBadge">0 connections</span>
+      <button id="answerButton" class="btn ghost" type="button">Instructor answer</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <section class="layout">
+      <aside class="card sidebar">
+        <div>
+          <h3>Legend</h3>
+          <div class="legend">
+            <div class="legend-row"><span class="symbol initial"></span><span>Initial node</span></div>
+            <div class="legend-row"><span class="symbol action"></span><span>Action</span></div>
+            <div class="legend-row"><span class="symbol decision"></span><span>Decision or merge</span></div>
+            <div class="legend-row"><span class="symbol final"></span><span>Activity final</span></div>
+          </div>
+        </div>
+
+        <div class="section-rule">
+          <p class="help">Drag a block's body to move it. Drag from an edge dot to another block to connect it. Click a connection line to remove it.</p>
+        </div>
+
+        <div class="section-rule stack">
+          <button id="hintButton" class="btn full" type="button">Get a hint</button>
+          <button id="resetButton" class="btn full" type="button">Shuffle and reset</button>
+        </div>
+
+        <button id="checkButton" class="btn primary full" type="button">Check process logic</button>
+      </aside>
+
+      <div class="workspace-wrap">
+        <div class="workspace-head">
+          <h3 style="font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;text-transform:uppercase;">Student workspace</h3>
+          <span class="hint-text" id="hintsUsedText">0 hints used</span>
+        </div>
+
+        <div id="workspace" aria-label="Activity diagram construction canvas">
+          <svg id="connectionLayer" aria-hidden="true">
+            <defs>
+              <marker id="builderArrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+                <path d="M0,0 L0,6 L9,3 z" fill="var(--ink)"></path>
+              </marker>
+              <marker id="answerArrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+                <path d="M0,0 L0,6 L9,3 z" fill="var(--success)"></path>
+              </marker>
+              <marker id="dragArrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+                <path d="M0,0 L0,6 L9,3 z" fill="var(--cyan)"></path>
+              </marker>
+            </defs>
+            <g id="answerLines"></g>
+            <g id="connectionLines"></g>
+            <g id="dragLineLayer"></g>
+          </svg>
+          <div id="nodeLayer"></div>
+        </div>
+      </div>
+    </section>
+
+    <div id="feedback" class="feedback" aria-live="polite">
+      <div class="feedback-head"><span>Your task</span></div>
+      <p>Connect the blocks so every possible penalty-kick outcome follows the correct causal path.</p>
+    </div>
+
+    <div class="metrics">
+      <div class="metric"><div class="metric-label">Attempts</div><div class="metric-value" id="attemptsValue">0</div></div>
+      <div class="metric"><div class="metric-label">Hints used</div><div class="metric-value" id="hintsValue">0</div></div>
+      <div class="metric"><div class="metric-label">Model status</div><div class="metric-value" id="modelStatus">Incomplete</div></div>
+    </div>
+  </div>
+
+  <dialog id="passwordDialog">
+    <div class="dialog-body">
+      <div>
+        <h3 style="font-family:'Barlow Condensed',sans-serif;font-size:19px;font-weight:700;">Instructor access</h3>
+        <p class="help" style="margin-top:6px">Enter the instructor password to overlay the correct connections on your diagram.</p>
+      </div>
+      <label>
+        Password
+        <input id="enteredPassword" type="password" autocomplete="current-password">
+      </label>
+      <p id="passwordFeedback" class="error" aria-live="polite"></p>
+      <div class="dialog-actions">
+        <button id="cancelPasswordButton" class="btn" type="button">Cancel</button>
+        <button id="submitPasswordButton" class="btn primary" type="button">Reveal answer</button>
+      </div>
+    </div>
+  </dialog>
+</div>
+
+<script>
+  const INSTRUCTOR_PASSWORD = 'stevens611';
+
+  const workspace = document.getElementById('workspace');
+  const nodeLayer = document.getElementById('nodeLayer');
+  const svg = document.getElementById('connectionLayer');
+  const connectionLines = document.getElementById('connectionLines');
+  const answerLines = document.getElementById('answerLines');
+  const dragLineLayer = document.getElementById('dragLineLayer');
+  const connBadge = document.getElementById('connBadge');
+  const feedback = document.getElementById('feedback');
+  const modelStatus = document.getElementById('modelStatus');
+  const attemptsValue = document.getElementById('attemptsValue');
+  const hintsValue = document.getElementById('hintsValue');
+  const hintsUsedText = document.getElementById('hintsUsedText');
+  const passwordDialog = document.getElementById('passwordDialog');
+  const enteredPassword = document.getElementById('enteredPassword');
+  const passwordFeedback = document.getElementById('passwordFeedback');
+
+  const definitions = [
+    { id: 'start', label: 'Start', type: 'initial' },
+    { id: 'wait', label: 'Wait for referee signal', type: 'action' },
+    { id: 'approach', label: 'Approach ball', type: 'action' },
+    { id: 'kick', label: 'Kick ball', type: 'action' },
+    { id: 'onTarget', label: 'Shot on target?', type: 'decision' },
+    { id: 'saved', label: 'Goalkeeper saves?', type: 'decision' },
+    { id: 'miss', label: 'Record miss', type: 'action' },
+    { id: 'save', label: 'Record save', type: 'action' },
+    { id: 'goal', label: 'Record goal', type: 'action' },
+    { id: 'merge', label: '', type: 'merge' },
+    { id: 'end', label: 'End', type: 'final' }
+  ];
+
+  const correctEdges = [
+    ['start', 'wait'], ['wait', 'approach'], ['approach', 'kick'], ['kick', 'onTarget'],
+    ['onTarget', 'miss'], ['onTarget', 'saved'], ['saved', 'save'], ['saved', 'goal'],
+    ['miss', 'merge'], ['save', 'merge'], ['goal', 'merge'], ['merge', 'end']
+  ];
+
+  const edgeLabels = {
+    'onTarget>miss': '[no]', 'onTarget>saved': '[yes]',
+    'saved>save': '[yes]', 'saved>goal': '[no]'
+  };
+
+  let connections = [];
+  let attempts = 0;
+  let hintsUsed = 0;
+  let showAnswer = false;
+  let connectDrag = null;
+  let bodyDrag = null;
+
+  function randomPosition(index) {
+    const width = Math.max(workspace.clientWidth, 560);
+    const cols = 4;
+    const col = index % cols;
+    const row = Math.floor(index / cols);
+    const spacing = Math.max(150, (width - 190) / cols);
+    return { x: 18 + col * spacing + Math.random() * 18, y: 25 + row * 165 + Math.random() * 24 };
+  }
+
+  function createNodes() {
+    nodeLayer.innerHTML = '';
+    definitions.forEach((definition, index) => {
+      const node = document.createElement('div');
+      node.className = `builder-node ${definition.type}`;
+      node.dataset.id = definition.id;
+
+      if (definition.type === 'decision' || definition.type === 'merge') {
+        node.insertAdjacentHTML('beforeend',
+          '<svg class="diamond-shape" viewBox="0 0 100 100" preserveAspectRatio="none"><polygon points="50,4 96,50 50,96 4,50"/></svg>');
+      }
+      if (definition.type === 'decision' && definition.label) {
+        const caption = document.createElement('div');
+        caption.className = 'node-caption';
+        caption.textContent = definition.label;
+        node.appendChild(caption);
+      }
+
+      const body = document.createElement('div');
+      body.className = 'body';
+      body.textContent = (definition.type === 'decision' || definition.type === 'merge') ? '' : definition.label;
+      node.appendChild(body);
+
+      ['top', 'right', 'bottom', 'left'].forEach(side => {
+        const h = document.createElement('div');
+        h.className = 'handle ' + side;
+        h.dataset.side = side;
+        h.addEventListener('pointerdown', startConnect);
+        node.appendChild(h);
+      });
+
+      const position = randomPosition(index);
+      node.style.left = `${position.x}px`;
+      node.style.top = `${position.y}px`;
+
+      node.addEventListener('pointerdown', startBodyDrag);
+      nodeLayer.appendChild(node);
+    });
+    requestAnimationFrame(drawConnections);
+  }
+
+  function startBodyDrag(event) {
+    const node = event.currentTarget.closest('.builder-node');
+    const workspaceRect = workspace.getBoundingClientRect();
+    const nodeRect = node.getBoundingClientRect();
+    bodyDrag = {
+      node,
+      offsetX: event.clientX - nodeRect.left,
+      offsetY: event.clientY - nodeRect.top,
+      workspaceRect
+    };
+    node.classList.add('dragging');
+    document.addEventListener('pointermove', moveBodyDrag);
+    document.addEventListener('pointerup', endBodyDrag, { once: true });
+  }
+  function moveBodyDrag(event) {
+    if (!bodyDrag) return;
+    const node = bodyDrag.node;
+    const maxX = workspace.clientWidth - node.offsetWidth;
+    const maxY = workspace.clientHeight - node.offsetHeight;
+    const x = Math.max(0, Math.min(maxX, event.clientX - bodyDrag.workspaceRect.left - bodyDrag.offsetX));
+    const y = Math.max(0, Math.min(maxY, event.clientY - bodyDrag.workspaceRect.top - bodyDrag.offsetY));
+    node.style.left = `${x}px`;
+    node.style.top = `${y}px`;
+    drawConnections();
+  }
+  function endBodyDrag() {
+    if (bodyDrag) bodyDrag.node.classList.remove('dragging');
+    bodyDrag = null;
+    document.removeEventListener('pointermove', moveBodyDrag);
+  }
+
+  function startConnect(event) {
+    event.stopPropagation();
+    const node = event.currentTarget.closest('.builder-node');
+    const workspaceRect = workspace.getBoundingClientRect();
+    connectDrag = { sourceId: node.dataset.id, workspaceRect };
+    document.addEventListener('pointermove', moveConnect);
+    document.addEventListener('pointerup', endConnect, { once: true });
+  }
+  function moveConnect(event) {
+    if (!connectDrag) return;
+    const a = nodeCenter(connectDrag.sourceId);
+    const x = event.clientX - connectDrag.workspaceRect.left;
+    const y = event.clientY - connectDrag.workspaceRect.top;
+    dragLineLayer.innerHTML = '';
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('class', 'drag-line');
+    path.setAttribute('marker-end', 'url(#dragArrow)');
+    path.setAttribute('d', `M ${a.x} ${a.y} L ${x} ${y}`);
+    dragLineLayer.appendChild(path);
+  }
+  function endConnect(event) {
+    dragLineLayer.innerHTML = '';
+    document.removeEventListener('pointermove', moveConnect);
+    if (!connectDrag) return;
+    const target = document.elementFromPoint(event.clientX, event.clientY);
+    const targetNode = target ? target.closest('.builder-node') : null;
+    if (targetNode && targetNode.dataset.id !== connectDrag.sourceId) {
+      const targetId = targetNode.dataset.id;
+      const duplicate = connections.some(e => e[0] === connectDrag.sourceId && e[1] === targetId);
+      if (!duplicate) {
+        connections.push([connectDrag.sourceId, targetId]);
+        updateBadge();
+        drawConnections(true);
+      }
+    }
+    connectDrag = null;
+  }
+
+  function nodeCenter(id) {
+    const node = document.querySelector(`[data-id="${id}"]`);
+    const workspaceRect = workspace.getBoundingClientRect();
+    const rect = node.getBoundingClientRect();
+    return { x: rect.left - workspaceRect.left + rect.width / 2, y: rect.top - workspaceRect.top + rect.height / 2 };
+  }
+
+  function pathFor(a, b) {
+    const midY = a.y + (b.y - a.y) / 2;
+    return `M ${a.x} ${a.y} C ${a.x} ${midY}, ${b.x} ${midY}, ${b.x} ${b.y}`;
+  }
+
+  function drawConnections(animateLast) {
+    svg.setAttribute('viewBox', `0 0 ${workspace.clientWidth} ${workspace.clientHeight}`);
+    connectionLines.innerHTML = '';
+
+    connections.forEach(([source, target], idx) => {
+      const a = nodeCenter(source);
+      const b = nodeCenter(target);
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('class', 'edge-line');
+      path.setAttribute('d', pathFor(a, b));
+      path.addEventListener('click', () => removeConnection(idx));
+      connectionLines.appendChild(path);
+
+      if (animateLast && idx === connections.length - 1) {
+        const len = path.getTotalLength();
+        path.style.strokeDasharray = len;
+        path.style.strokeDashoffset = len;
+        path.getBoundingClientRect();
+        path.style.transition = 'stroke-dashoffset .35s ease';
+        requestAnimationFrame(() => { path.style.strokeDashoffset = 0; });
+      }
+
+      const labelText = edgeLabels[`${source}>${target}`];
+      if (labelText) {
+        const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        label.setAttribute('class', 'edge-label');
+        label.setAttribute('x', String((a.x + b.x) / 2 + 6));
+        label.setAttribute('y', String((a.y + b.y) / 2 - 7));
+        label.textContent = labelText;
+        connectionLines.appendChild(label);
+      }
+    });
+
+    if (showAnswer) drawAnswerOverlay();
+  }
+
+  function drawAnswerOverlay() {
+    answerLines.innerHTML = '';
+    correctEdges.forEach(([source, target]) => {
+      const a = nodeCenter(source);
+      const b = nodeCenter(target);
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('class', 'answer-line');
+      path.setAttribute('marker-end', 'url(#answerArrow)');
+      path.setAttribute('d', pathFor(a, b));
+      answerLines.appendChild(path);
+    });
+  }
+
+  function removeConnection(idx) {
+    const paths = connectionLines.querySelectorAll('path.edge-line');
+    if (paths[idx]) paths[idx].classList.add('removing');
+    setTimeout(() => {
+      connections.splice(idx, 1);
+      updateBadge();
+      drawConnections();
+    }, 130);
+  }
+
+  function updateBadge() {
+    connBadge.textContent = `${connections.length} connection${connections.length === 1 ? '' : 's'}`;
+  }
+
+  function edgeKey(e) { return `${e[0]}>${e[1]}`; }
+  function findNodeLabel(id) {
+    const d = definitions.find(item => item.id === id);
+    return d && d.label ? d.label : 'merge point';
+  }
+
+  function clearStatusIcons() {
+    document.querySelectorAll('.status-icon').forEach(n => n.remove());
+    document.querySelectorAll('.builder-node').forEach(n => n.classList.remove('correct', 'wrong'));
+  }
+
+  function checkDiagram() {
+    attempts += 1;
+    attemptsValue.textContent = attempts;
+    const expected = new Set(correctEdges.map(edgeKey));
+    const submitted = new Set(connections.map(edgeKey));
+    const missing = correctEdges.filter(e => !submitted.has(edgeKey(e)));
+    const extra = connections.filter(e => !expected.has(edgeKey(e)));
+
+    clearStatusIcons();
+
+    if (missing.length === 0 && extra.length === 0) {
+      modelStatus.textContent = 'Correct';
+      feedback.className = 'feedback correct';
+      feedback.innerHTML = '<div class="feedback-head">Process logic is correct</div><p>Every action, decision, outcome, and merge is connected correctly. Your layout is accepted as-is.</p>';
+      document.querySelectorAll('.builder-node').forEach(n => n.classList.add('correct'));
+      playSuccessAnimation();
+      return;
+    }
+
+    modelStatus.textContent = 'Needs revision';
+    feedback.className = 'feedback wrong';
+
+    document.querySelectorAll('.builder-node').forEach(node => {
+      const id = node.dataset.id;
+      const hasMissing = missing.some(e => e[0] === id || e[1] === id);
+      const hasExtra = extra.some(e => e[0] === id || e[1] === id);
+      if (hasExtra) node.classList.add('wrong');
+    });
+
+    if (attempts === 1) {
+      feedback.innerHTML = `<div class="feedback-head">Revise the process logic</div><p>${missing.length} required connection${missing.length === 1 ? ' is' : 's are'} missing and ${extra.length} connection${extra.length === 1 ? ' is' : 's are'} unexpected. Try again, or use a hint if you're stuck.</p>`;
+    } else {
+      const parts = [];
+      if (missing.length) {
+        const examples = missing.slice(0, 3).map(([s, t]) => `"${findNodeLabel(s)}" to "${findNodeLabel(t)}"`).join('; ');
+        parts.push(`${missing.length} required connection${missing.length === 1 ? ' is' : 's are'} missing, including ${examples}.`);
+      }
+      if (extra.length) {
+        const examples = extra.slice(0, 3).map(([s, t]) => `"${findNodeLabel(s)}" to "${findNodeLabel(t)}"`).join('; ');
+        parts.push(`${extra.length} connection${extra.length === 1 ? ' is' : 's are'} incorrect, including ${examples}.`);
+      }
+      feedback.innerHTML = `<div class="feedback-head">Revise the process logic</div><p>${parts.join(' ')} Block placement is not scored.</p>`;
+    }
+  }
+
+  function giveHint() {
+    const expected = new Set(correctEdges.map(edgeKey));
+    const submitted = new Set(connections.map(edgeKey));
+    const missing = correctEdges.filter(e => !submitted.has(edgeKey(e)));
+    const extra = connections.filter(e => !expected.has(edgeKey(e)));
+
+    hintsUsed += 1;
+    hintsValue.textContent = hintsUsed;
+    hintsUsedText.textContent = `${hintsUsed} hint${hintsUsed === 1 ? '' : 's'} used`;
+
+    feedback.className = 'feedback';
+    if (extra.length) {
+      const [s, t] = extra[0];
+      feedback.innerHTML = `<div class="feedback-head">Hint</div><p>Double check the connection from "${findNodeLabel(s)}" to "${findNodeLabel(t)}" &mdash; it doesn't belong.</p>`;
+    } else if (missing.length) {
+      const [s] = missing[0];
+      feedback.innerHTML = `<div class="feedback-head">Hint</div><p>"${findNodeLabel(s)}" is missing at least one outgoing connection it needs.</p>`;
+    } else {
+      feedback.innerHTML = `<div class="feedback-head">Hint</div><p>Your diagram looks complete &mdash; try checking it.</p>`;
+    }
+  }
+
+  function playSuccessAnimation() {
+    const adjacency = {};
+    connections.forEach(([s, t]) => { (adjacency[s] = adjacency[s] || []).push(t); });
+    const order = [];
+    const visited = new Set();
+    const queue = ['start'];
+    while (queue.length) {
+      const id = queue.shift();
+      (adjacency[id] || []).forEach(next => {
+        const key = id + '>' + next;
+        if (!visited.has(key)) { visited.add(key); order.push([id, next]); queue.push(next); }
+      });
+    }
+    let i = 0;
+    function step() {
+      if (i >= order.length) return;
+      const [s, t] = order[i];
+      const a = nodeCenter(s), b = nodeCenter(t);
+      const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      dot.setAttribute('r', '6');
+      dot.setAttribute('fill', 'var(--cyan)');
+      dot.setAttribute('cx', a.x);
+      dot.setAttribute('cy', a.y);
+      dot.style.transition = 'cx .4s ease, cy .4s ease';
+      dragLineLayer.appendChild(dot);
+      requestAnimationFrame(() => { dot.setAttribute('cx', b.x); dot.setAttribute('cy', b.y); });
+      setTimeout(() => dot.remove(), 450);
+      i += 1;
+      setTimeout(step, 220);
+    }
+    step();
+  }
+
+  function resetAll() {
+    connections = [];
+    attempts = 0;
+    hintsUsed = 0;
+    showAnswer = false;
+    answerLines.innerHTML = '';
+    attemptsValue.textContent = '0';
+    hintsValue.textContent = '0';
+    hintsUsedText.textContent = '0 hints used';
+    document.getElementById('answerButton').textContent = 'Instructor answer';
+    clearStatusIcons();
+    createNodes();
+    updateBadge();
+    modelStatus.textContent = 'Incomplete';
+    feedback.className = 'feedback';
+    feedback.innerHTML = '<div class="feedback-head">Your task</div><p>Connect the blocks so every possible penalty-kick outcome follows the correct causal path.</p>';
+  }
+
+  document.getElementById('checkButton').addEventListener('click', checkDiagram);
+  document.getElementById('hintButton').addEventListener('click', giveHint);
+  document.getElementById('resetButton').addEventListener('click', resetAll);
+
+  document.getElementById('answerButton').addEventListener('click', () => {
+    if (showAnswer) {
+      showAnswer = false;
+      answerLines.innerHTML = '';
+      document.getElementById('answerButton').textContent = 'Instructor answer';
+      return;
+    }
+    enteredPassword.value = '';
+    passwordFeedback.textContent = '';
+    passwordDialog.showModal();
+  });
+  document.getElementById('cancelPasswordButton').addEventListener('click', () => passwordDialog.close());
+  document.getElementById('submitPasswordButton').addEventListener('click', () => {
+    if (enteredPassword.value !== INSTRUCTOR_PASSWORD) {
+      passwordFeedback.textContent = 'Incorrect password.';
+      return;
+    }
+    passwordDialog.close();
+    showAnswer = true;
+    document.getElementById('answerButton').textContent = 'Hide answer';
+    drawConnections();
+  });
+  enteredPassword.addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('submitPasswordButton').click();
+  });
+
+  window.addEventListener('resize', () => drawConnections());
+
+  createNodes();
+  updateBadge();
+</script>
+</body>
+</html>
