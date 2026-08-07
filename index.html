@@ -59,7 +59,12 @@
   }
   .unitnav a:hover{ color:var(--ink); border-color:var(--line); }
 
-  main{ max-width:980px; margin:0 auto; padding:0 8vw 90px; }
+  main{
+  width:100%;
+  max-width:1440px;
+  margin:0 auto;
+  padding:0 clamp(24px, 4vw, 64px) 90px;
+  }
 
   /* ---------- unit section ---------- */
   .unit{ padding-top:56px; scroll-margin-top:52px; }
@@ -121,9 +126,13 @@
   .no-tool{ font-size:12px; color:var(--ink-faint); font-style:italic; margin-top:12px; }
 
   footer{
-    max-width:980px; margin:0 auto; padding:40px 8vw 60px;
-    font-size:12.5px; color:var(--ink-muted);
-    border-top:1px solid var(--line); margin-top:16px;
+  width:100%;
+  max-width:1440px;
+  margin:16px auto 0;
+  padding:40px clamp(24px, 4vw, 64px) 60px;
+  font-size:12.5px;
+  color:var(--ink-muted);
+  border-top:1px solid var(--line);
   }
 
   @media(max-width:640px){
@@ -260,16 +269,33 @@
   }
 
   const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  function startOfWeek(date) {
+    const d = new Date(date);
+    const day = d.getDay(); // Sun = 0, Mon = 1
+    const diff = day === 0 ? -6 : 1 - day; // Monday start
+    d.setDate(d.getDate() + diff);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }
+  
+  const thisWeekStart = startOfWeek(today);
+  const thisWeekEnd = new Date(thisWeekStart);
+  thisWeekEnd.setDate(thisWeekEnd.getDate() + 7);
+  
   let currentWeekKey = null;
-  let closestFuture = null;
-  units.forEach(u => u.weeks.forEach(w => {
-    const d = parseDate(w.date);
-    if (!d) return;
-    if (d >= today && (!closestFuture || d < closestFuture.date)) {
-      closestFuture = { date: d, key: u.id + w.wk };
-    }
-  }));
-  if (closestFuture) currentWeekKey = closestFuture.key;
+  
+  units.forEach(unit => {
+    unit.weeks.forEach(w => {
+      const d = parseDate(w.date);
+      if (!d) return;
+  
+      if (d >= thisWeekStart && d < thisWeekEnd) {
+        currentWeekKey = unit.id + w.wk;
+      }
+    });
+  });
 
   const nav = document.getElementById('unitnav');
   const main = document.getElementById('main');
