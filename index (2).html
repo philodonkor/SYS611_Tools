@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SYS 611 — Lecture Tools</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+  :root{
+    --navy:#0A0A0D;
+    --navy-soft:#14161B;
+    --cyan:#2BB4E0;
+    --cyan-soft:#B9E7F5;
+    --cyan-faint:#E7F6FC;
+    --paper:#F7F8FA;
+    --card:#FFFFFF;
+    --line:#E2E5EA;
+    --ink:#14171C;
+    --ink-muted:#5B6472;
+    --ink-faint:#9AA2AD;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family:'Inter',-apple-system,Helvetica,Arial,sans-serif;
+    background:var(--paper); color:var(--ink); -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,p{margin:0}
+  a{color:inherit}
+
+  /* ---------- hero ---------- */
+  .hero{
+    background:var(--navy); border-bottom:2px solid var(--cyan);
+    padding:60px 8vw 46px; position:relative; overflow:hidden;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace; font-size:12.5px; letter-spacing:0.1em;
+    color:var(--cyan); text-transform:uppercase;
+  }
+  h1{
+    font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:52px;
+    color:#FFFFFF; text-transform:uppercase; letter-spacing:0.01em; margin-top:8px;
+  }
+  .hero p{ margin-top:14px; color:var(--cyan-soft); font-size:15.5px; max-width:520px; line-height:1.65; }
+
+  /* ---------- sticky unit nav ---------- */
+  .unitnav{
+    position:sticky; top:0; z-index:20;
+    background:rgba(247,248,250,0.92); backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);
+    display:flex; gap:0; overflow-x:auto;
+    padding:0 8vw;
+  }
+  .unitnav a{
+    font-family:'IBM Plex Mono',monospace; font-size:11.5px; letter-spacing:0.03em;
+    color:var(--ink-muted); text-decoration:none; white-space:nowrap;
+    padding:13px 16px; border-bottom:2px solid transparent;
+    transition:color .15s ease, border-color .15s ease;
+  }
+  .unitnav a:hover{ color:var(--ink); border-color:var(--line); }
+
+  main{ max-width:980px; margin:0 auto; padding:0 8vw 90px; }
+
+  /* ---------- unit section ---------- */
+  .unit{ padding-top:56px; scroll-margin-top:52px; }
+  .unit-head{
+    position:relative; background:var(--navy); border-radius:14px;
+    padding:30px 32px; overflow:hidden; margin-bottom:22px;
+  }
+  .unit-motif{ position:absolute; top:0; right:0; height:100%; width:46%; opacity:0.9; }
+  .unit-num{
+    font-family:'IBM Plex Mono',monospace; font-size:12.5px; color:var(--cyan);
+    letter-spacing:0.1em; text-transform:uppercase; position:relative; z-index:1;
+  }
+  .unit-title{
+    font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:30px;
+    color:#fff; text-transform:uppercase; margin-top:4px; position:relative; z-index:1;
+    max-width:70%;
+  }
+  .unit-blurb{
+    color:var(--cyan-soft); font-size:13.5px; margin-top:8px; max-width:56%;
+    line-height:1.55; position:relative; z-index:1;
+  }
+
+  /* ---------- week cards ---------- */
+  .weeks{ display:flex; flex-direction:column; gap:10px; }
+  .week{
+    display:grid; grid-template-columns:92px 1fr; gap:18px;
+    background:var(--card); border:1px solid var(--line); border-radius:12px;
+    padding:18px 22px; position:relative;
+  }
+  .week.is-now{ border-color:var(--cyan); box-shadow:0 0 0 1px var(--cyan); }
+  .now-flag{
+    position:absolute; top:-10px; left:18px;
+    background:var(--cyan); color:#062230; font-family:'IBM Plex Mono',monospace;
+    font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;
+    padding:3px 9px; border-radius:20px;
+  }
+  .week-when{ display:flex; flex-direction:column; gap:2px; }
+  .week-date{ font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink-muted); }
+  .week-num{ font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:26px; color:var(--ink-faint); }
+  .week.is-now .week-num{ color:var(--cyan); }
+
+  .week-body{ min-width:0; }
+  .week-topic{ font-size:15.5px; font-weight:600; }
+  .week-sub{ font-size:12.5px; color:var(--ink-muted); margin-top:2px; }
+
+  .tools{ display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+  .tool-chip{
+    display:inline-flex; align-items:center; gap:8px;
+    background:var(--cyan-faint); color:#0E5C79; text-decoration:none;
+    padding:8px 12px 8px 10px; border-radius:9px;
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .tool-chip:hover{ transform:translateY(-1px); box-shadow:0 3px 10px rgba(43,180,224,0.25); }
+  .tool-chip svg{ width:15px; height:15px; flex-shrink:0; }
+  .tool-chip .tt{ display:flex; flex-direction:column; line-height:1.25; }
+  .tool-chip .tt b{ font-size:12.5px; font-weight:700; }
+  .tool-chip .tt span{ font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:#3D8AA8; text-transform:uppercase; letter-spacing:0.04em; }
+
+  .no-tool{ font-size:12px; color:var(--ink-faint); font-style:italic; margin-top:12px; }
+
+  footer{
+    max-width:980px; margin:0 auto; padding:40px 8vw 60px;
+    font-size:12.5px; color:var(--ink-muted);
+    border-top:1px solid var(--line); margin-top:16px;
+  }
+
+  @media(max-width:640px){
+    .hero{padding:44px 6vw 32px} h1{font-size:36px}
+    main{padding:0 6vw 60px}
+    .unitnav{padding:0 6vw}
+    .unit-head{padding:22px}
+    .unit-motif{display:none}
+    .unit-title,.unit-blurb{max-width:100%}
+    .week{grid-template-columns:1fr; gap:8px}
+    .week-when{flex-direction:row; align-items:baseline; gap:8px}
+  }
+</style>
+</head>
+<body>
+
+  <header class="hero">
+    <div class="eyebrow">SYS 611 &middot; Systems Modeling and Simulation</div>
+    <h1>Lecture Tools</h1>
+    <p>An interactive companion for this semester, organized the way the course actually unfolds. Jump to a unit, find your week, and launch what's built for it.</p>
+  </header>
+
+  <nav class="unitnav" id="unitnav"></nav>
+
+  <main id="main"></main>
+
+  <footer>Stevens Institute of Technology &middot; Fall 2026</footer>
+
+<script>
+  // ---------------------------------------------------------------- icons
+  const ICONS = {
+    diagram: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><path d="M10 6.5h4a2 2 0 0 1 2 2V14"/></svg>',
+    curve: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 19c3-.5 4-9 6-9s3 6 5 6 3-7 7-7"/></svg>',
+    default: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8.5"/><path d="M12 8v4l3 2"/></svg>',
+  };
+
+  // ---------------------------------------------------------------- motifs (quiet unit watermarks)
+  const MOTIFS = {
+    flow: `<svg class="unit-motif" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice">
+      <g stroke="#2BB4E0" stroke-width="1.3" fill="none" opacity="0.5">
+        <circle cx="40" cy="100" r="16"/>
+        <rect x="90" y="82" width="46" height="36" rx="5"/>
+        <rect x="180" y="82" width="46" height="36" rx="5"/>
+        <path d="M255 82 L300 100 L255 118 L210 100 Z"/>
+        <rect x="330" y="55" width="42" height="34" rx="5" opacity="0.7"/>
+        <rect x="330" y="111" width="42" height="34" rx="5" opacity="0.7"/>
+        <path d="M56 100H90M136 100H180M226 100H255M300 90L330 72M300 110L330 128" marker-end="url(#a1)"/>
+        <path d="M300 100 130 160 90 160" stroke-dasharray="1,5" opacity="0.6"/>
+      </g>
+      <defs><marker id="a1" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5" fill="none" stroke="#2BB4E0"/></marker></defs>
+    </svg>`,
+    curve: `<svg class="unit-motif" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice">
+      <g stroke="#2BB4E0" stroke-width="1.4" fill="none" opacity="0.55">
+        <path d="M40 165h320M40 165V40" opacity="0.5"/>
+        <path d="M45 163C90 163 110 60 165 60S240 163 285 163" opacity="0.9"/>
+        <path d="M120 163C160 163 190 90 245 90S330 163 375 163" stroke-dasharray="1,5" opacity="0.55"/>
+        <path d="M165 163V60" stroke-dasharray="1,4" opacity="0.4"/>
+      </g>
+    </svg>`,
+    network: `<svg class="unit-motif" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice">
+      <g opacity="0.6">
+        <g stroke="#3A414C" stroke-width="1">
+          <line x1="70" y1="130" x2="150" y2="70"/><line x1="70" y1="130" x2="150" y2="150"/>
+          <line x1="150" y1="70" x2="240" y2="55"/><line x1="150" y1="70" x2="150" y2="150"/>
+          <line x1="150" y1="150" x2="240" y2="150"/><line x1="240" y1="55" x2="240" y2="150"/>
+          <line x1="240" y1="55" x2="320" y2="90"/><line x1="240" y1="150" x2="320" y2="90"/>
+          <line x1="240" y1="150" x2="320" y2="160"/>
+        </g>
+        <circle cx="70" cy="130" r="6" fill="none" stroke="#2BB4E0" stroke-width="1.3"/>
+        <circle cx="150" cy="70" r="4.5" fill="none" stroke="#5B6472" stroke-width="1.3"/>
+        <circle cx="150" cy="150" r="6" fill="none" stroke="#2BB4E0" stroke-width="1.3"/>
+        <circle cx="240" cy="55" r="4.5" fill="none" stroke="#5B6472" stroke-width="1.3"/>
+        <circle cx="240" cy="150" r="6" fill="none" stroke="#2BB4E0" stroke-width="1.3"/>
+        <circle cx="320" cy="90" r="4.5" fill="none" stroke="#5B6472" stroke-width="1.3"/>
+        <circle cx="320" cy="160" r="4.5" fill="none" stroke="#5B6472" stroke-width="1.3"/>
+      </g>
+    </svg>`,
+  };
+
+  // ---------------------------------------------------------------- data
+  // Add a new tool to any week by adding an entry to its `tools` array:
+  // { name: "Tool Name", type: "Category Label", icon: "diagram" | "curve" | "default", href: "file.html" }
+  const units = [
+    {
+      id: "foundations", num: "Unit 01", title: "Foundations & Modeling Tools", motif: "flow",
+      blurb: "How to represent a system formally before you simulate it.",
+      weeks: [
+        { date: "Sept 3", wk: "W1", topic: "Introduction to Modeling Fundamentals", sub: "M&S in Systems Engineering", tools: [] },
+        { date: "Sept 10", wk: "W2", topic: "Modeling Tools", sub: "Conceptual & computational models", tools: [
+          { name: "Activity Diagram Builder", type: "Diagram Practice", icon: "diagram", href: "activity_diagram_builder.html" },
+        ]},
+      ],
+    },
+    {
+      id: "probability", num: "Unit 02", title: "Probability & Stochastic Methods", motif: "curve",
+      blurb: "The mathematical machinery behind Monte Carlo simulation.",
+      weeks: [
+        { date: "Sept 17", wk: "W3", topic: "Review of Probability", sub: "Random variables & process generators", tools: [] },
+        { date: "Sept 24", wk: "W4", topic: "Stochastic Simulation", sub: "Monte Carlo & variance reduction", tools: [] },
+        { date: "Oct 1", wk: "W5", topic: "Review Lecture", sub: "Practice problems", tools: [] },
+        { date: "Oct 8", wk: "W6", topic: "Exam 1", sub: "Weeks 1\u20134", tools: [] },
+      ],
+    },
+    {
+      id: "dynamic", num: "Unit 03", title: "Dynamic & Discrete-Event Systems", motif: "network",
+      blurb: "Systems that evolve continuously, or change state at irregular moments.",
+      weeks: [
+        { date: "Oct 15", wk: "W7", topic: "Dynamic Simulation", sub: "Discrete & continuous time models", tools: [] },
+        { date: "Oct 22", wk: "W8", topic: "Dynamic Probability Models", sub: "Markov chains & queuing theory", tools: [] },
+        { date: "Oct 29", wk: "W9", topic: "Discrete Event Models", sub: "Queuing & inventory systems", tools: [] },
+        { date: "Nov 5", wk: "W10", topic: "Simulation in Practice", sub: "Exam 2 review & VV&A", tools: [] },
+        { date: "Nov 12", wk: "W11", topic: "Exam 2", sub: "Weeks 7\u20139", tools: [] },
+        { date: "Nov 26", wk: "\u2014", topic: "No Class", sub: "Thanksgiving", tools: [], noToolRow: true },
+      ],
+    },
+    {
+      id: "advanced", num: "Unit 04", title: "Advanced Simulation & Capstone", motif: "flow",
+      blurb: "Building and defending a working simulation of your own.",
+      weeks: [
+        { date: "Dec 3", wk: "W12", topic: "Discrete Event Simulation", sub: "In SimPy & AnyLogic", tools: [] },
+        { date: "Dec 10", wk: "W13", topic: "Agent-based Simulation", sub: "Models & implementation in NetLogo", tools: [] },
+        { date: "Dec 17", wk: "W14", topic: "No Class", sub: "Independent work time on the term project", tools: [] },
+      ],
+    },
+  ];
+
+  // ---------------------------------------------------------------- render
+  function parseDate(dateStr) {
+    if (dateStr.includes('\u2014')) return null;
+    const [mon, day] = dateStr.split(' ');
+    const months = {Sept:8, Oct:9, Nov:10, Dec:11};
+    if (!(mon in months)) return null;
+    return new Date(2026, months[mon], parseInt(day));
+  }
+
+  const today = new Date();
+  let currentWeekKey = null;
+  let closestFuture = null;
+  units.forEach(u => u.weeks.forEach(w => {
+    const d = parseDate(w.date);
+    if (!d) return;
+    if (d >= today && (!closestFuture || d < closestFuture.date)) {
+      closestFuture = { date: d, key: u.id + w.wk };
+    }
+  }));
+  if (closestFuture) currentWeekKey = closestFuture.key;
+
+  const nav = document.getElementById('unitnav');
+  const main = document.getElementById('main');
+
+  units.forEach(unit => {
+    nav.insertAdjacentHTML('beforeend', `<a href="#${unit.id}">${unit.num}</a>`);
+
+    const section = document.createElement('section');
+    section.className = 'unit';
+    section.id = unit.id;
+
+    const weekRows = unit.weeks.map(w => {
+      const isNow = (unit.id + w.wk) === currentWeekKey;
+      const toolsHtml = w.tools.length
+        ? `<div class="tools">${w.tools.map(t => `
+            <a class="tool-chip" href="${t.href}">
+              ${ICONS[t.icon] || ICONS.default}
+              <span class="tt"><b>${t.name}</b><span>${t.type}</span></span>
+            </a>`).join('')}</div>`
+        : (w.noToolRow ? '' : `<p class="no-tool">No tool for this lecture</p>`);
+
+      return `
+        <div class="week${isNow ? ' is-now' : ''}">
+          ${isNow ? '<span class="now-flag">This week</span>' : ''}
+          <div class="week-when">
+            <span class="week-date">${w.date}</span>
+            <span class="week-num">${w.wk}</span>
+          </div>
+          <div class="week-body">
+            <div class="week-topic">${w.topic}</div>
+            <div class="week-sub">${w.sub}</div>
+            ${toolsHtml}
+          </div>
+        </div>`;
+    }).join('');
+
+    section.innerHTML = `
+      <div class="unit-head">
+        ${MOTIFS[unit.motif]}
+        <div class="unit-num">${unit.num}</div>
+        <div class="unit-title">${unit.title}</div>
+        <div class="unit-blurb">${unit.blurb}</div>
+      </div>
+      <div class="weeks">${weekRows}</div>
+    `;
+    main.appendChild(section);
+  });
+</script>
+</body>
+</html>
