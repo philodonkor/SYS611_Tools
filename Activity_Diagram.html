@@ -52,8 +52,11 @@
      BRIEF SCREEN
      ================================================================ */
   .brief{ background:var(--navy); min-height:100vh; padding-block:clamp(32px,6vw,60px); position:relative; overflow:hidden; }
-  .brief-motif{ position:absolute; top:6%; right:-4%; width:32%; height:66%; opacity:0.3; pointer-events:none; }
   .brief-inner{ position:relative; z-index:1; }
+  .brief-illustration{
+    display:block; width:100%; max-width:74ch; height:auto; margin-top:clamp(20px,3vw,32px);
+    border:1px solid #262931; border-radius:12px; background:#0E1015;
+  }
   .brief-masthead{
     display:flex; align-items:baseline; justify-content:space-between; flex-wrap:wrap;
     gap:8px 20px; margin-bottom:clamp(24px,4vw,40px);
@@ -314,53 +317,58 @@
 <body>
 
 <section id="briefScreen" class="brief">
-  <svg class="brief-motif" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-    <g fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.7">
-      <g style="stroke:var(--cyan-bright)" stroke-width="1.4">
-        <circle cx="30" cy="100" r="7" style="fill:var(--cyan-bright)" stroke="none"/>
-        <path d="M37 100H78"/>
-        <rect x="78" y="76" width="60" height="48" rx="5"/>
-        <path d="M138 100H168"/>
-        <rect x="168" y="76" width="60" height="48" rx="5"/>
-        <path d="M228 100H256"/>
-        <path d="M284 76 312 100 284 124 256 100Z"/>
-        <path d="M312 100 336 66M312 100 336 134"/>
-        <rect x="336" y="48" width="48" height="36" rx="4"/>
-        <rect x="336" y="116" width="48" height="36" rx="4"/>
-        <circle cx="393" cy="100" r="9"/>
-        <circle cx="393" cy="100" r="3.5" style="fill:var(--cyan-bright)" stroke="none"/>
-      </g>
-    </g>
-  </svg>
-
   <div class="brief-inner shell">
     <div class="brief-masthead">
       <span>Stevens Institute of Technology</span>
       <span>SYS 611 · Fall 2026</span>
     </div>
-    <p class="brief-eyebrow">Building Activity Diagrams</p>
+    <p class="brief-eyebrow">Diagram Builder</p>
     <h1>The penalty kick</h1>
-    <p class="brief-lede">A penalty kick begins when the referee signals the player to proceed. The player approaches the ball and takes the shot. The attempt may go off target, be saved by the goalkeeper, or result in a goal. Once the outcome is determined, it is recorded and the penalty-kick process ends.</p>
+    <p class="brief-lede">The referee signals the kicker to proceed. The ball may go off target, be saved by the goalkeeper, or find the net. Once the outcome is clear, it's recorded and play resumes.</p>
+
+    <svg class="brief-illustration" viewBox="0 0 640 260" role="img" aria-label="A kicker striking a penalty toward a goalkeeper set on the line.">
+      <g fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+        <g style="stroke:var(--cyan-bright)" stroke-width="1.6">
+          <path d="M20 226H620" opacity="0.4"/>
+          <circle cx="230" cy="226" r="2.5" style="fill:var(--cyan-bright)" stroke="none"/>
+          <path d="M198 226a34 34 0 0 1 30-30" stroke-dasharray="1,5" opacity="0.5"/>
+          <path d="M430 60V226M430 60H610M610 60V226"/>
+          <g stroke-width="0.7" opacity="0.35">
+            <path d="M430 80H610M430 100H610M430 120H610M430 140H610M430 160H610M430 180H610M430 200H610"/>
+            <path d="M450 60V226M470 60V226M490 60V226M510 60V226M530 60V226M550 60V226M570 60V226M590 60V226"/>
+          </g>
+          <circle cx="520" cy="150" r="11"/>
+          <path d="M520 161V196"/>
+          <path d="M520 168 L494 148M520 168 L546 148"/>
+          <path d="M520 196 L500 222M520 196 L540 222"/>
+          <circle cx="150" cy="176" r="11"/>
+          <path d="M150 187 L172 210"/>
+          <path d="M158 194 L138 176M158 194 L182 202"/>
+          <path d="M172 210 L192 226M172 210 L158 232"/>
+          <circle cx="230" cy="222" r="8"/>
+          <path d="M230 214 224 219 226 226 234 226 236 219Z" stroke-width="1"/>
+        </g>
+      </g>
+    </svg>
 
     <div class="brief-col">
-
       <div>
-        <p class="task-line">Develop an activity diagram sufficient to reproduce the possible logical paths described above. Choose the control structures the behavior actually requires.</p>
+        <p class="task-line">Build an activity diagram that reproduces every path above, using only the control structures the behavior actually requires.</p>
       </div>
 
       <div class="callout">
         <p class="callout-label">Modeling Boundary</p>
-        <p class="callout-note">Treat the penalty attempt as the system of interest. The model begins when the referee authorizes the kick and ends after the outcome has been classified and recorded. Actions before authorization, and events after the result is recorded, are outside the model boundary.</p>
+        <p class="callout-note">The model begins at the referee's signal and ends once the outcome is recorded — nothing before or after that window belongs in your diagram.</p>
       </div>
 
       <div class="callout">
         <p class="callout-label">Abstraction Rule</p>
         <p class="callout-quote">Model control flow, not physical dynamics.</p>
-        <p class="callout-note" style="margin-top:8px">The ball's continuous trajectory is physical behavior, outside the scope of this diagram. </p>
+        <p class="callout-note" style="margin-top:8px">The ball's continuous trajectory is physical behavior — outside this diagram's scope.</p>
       </div>
 
       <div>
-        <p class="callout-label" style="color:var(--ink-faint)">Before you check your work, trace these three executions through your diagram</p>
+        <p class="callout-label" style="color:var(--ink-faint)">Trace these three executions before you check your work</p>
         <ul class="trace-list">
           <li>An attempt that misses the target entirely</li>
           <li>An on-target attempt that the goalkeeper stops</li>
@@ -369,13 +377,13 @@
       </div>
 
       <div class="pool-note">
-        The workspace starts empty. You'll build your model from a pool of candidate cards. Not every card describes something that belongs in an activity diagram at this level of abstraction. Deciding what to include is part of the exercise.
+        The workspace starts empty. Not every candidate card belongs — deciding which do is part of the exercise.
       </div>
     </div>
 
     <div class="brief-cta">
       <button id="beginButton" class="btn primary" type="button">Begin building</button>
-      <span class="hint-text" style="color:var(--ink-faint)">Have fun!.</span>
+      <span class="hint-text" style="color:var(--ink-faint)">Card placement isn't scored — your choices and connections are.</span>
     </div>
   </div>
 </section>
@@ -386,7 +394,7 @@
     <div>
       <div class="eyebrow">SYS 611 &middot; Diagram Builder</div>
       <h1>Model the penalty-kick process</h1>
-      <p class="subtitle">Add cards from the pool to the workspace, then drag from a block's edge dots to connect it to another block. Not every card belongs &mdash; leaving one in the pool is a valid choice.</p>
+      <p class="subtitle">Add cards to the workspace, then drag between edge dots to connect them. Leaving a card in the pool can be the right call.</p>
     </div>
     <div class="row">
       <span class="badge" id="connBadge">0 connections</span>
@@ -409,7 +417,7 @@
         </div>
 
         <div class="section-rule">
-          <p class="help">Click a card below to add it to the workspace. Drag from an edge dot to connect blocks &mdash; a decision will ask you to choose a guard. Click a connection or the × on a block to remove it.</p>
+          <p class="help">Click a card to add it. Drag between edge dots to connect blocks &mdash; decisions prompt for a guard. Click a connection or × to remove it.</p>
         </div>
 
         <div class="section-rule">
