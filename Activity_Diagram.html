@@ -3,105 +3,178 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Build the Activity Diagram</title>
+<title>SYS 611 — Activity Diagram Builder</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
   :root{
-    --navy:#0A0A0D;
-    --navy-soft:#14161B;
-    --navy-soft2:#1B1E25;
-    --cyan:#2BB4E0;
-    --cyan-soft:#B9E7F5;
-    --cyan-faint:#E7F6FC;
-    --paper:#F7F8FA;
+    --navy:#0B0C10;
+    --cyan:#166B8C;
+    --cyan-bright:#2BB4E0;
+    --cyan-soft:#BFE3F0;
+    --cyan-faint:#EAF5F9;
+    --paper:#FBFAF8;
     --card:#FFFFFF;
-    --line:#E2E5EA;
-    --ink:#14171C;
-    --ink-muted:#5B6472;
-    --danger:#D64545;
+    --line:#E1DFDA;
+    --line-strong:#C9C6BF;
+    --ink:#15161A;
+    --ink-muted:#565A62;
+    --ink-faint:#696D74;
+    --danger:#C23B3B;
     --danger-bg:#FBEAEA;
-    --success:#1F9D55;
+    --success:#167A46;
     --success-bg:#E7F7ED;
+    --warning:#8A5A00;
+    --warning-bg:#FBF1E0;
+
+    --fs-micro: clamp(0.72rem, 0.70rem + 0.10vw, 0.78rem);
+    --fs-xs:    clamp(0.80rem, 0.77rem + 0.14vw, 0.88rem);
+    --fs-sm:    clamp(0.90rem, 0.87rem + 0.14vw, 0.98rem);
+    --fs-body:  clamp(1rem, 0.97rem + 0.16vw, 1.08rem);
+    --fs-h3:    clamp(1.2rem, 1.1rem + 0.4vw, 1.5rem);
+
+    --content-max: 1240px;
+    --gutter: clamp(20px, 4vw, 56px);
   }
   *{box-sizing:border-box}
-  body{
-    margin:0;
-    font-family:'Inter',-apple-system,Helvetica,Arial,sans-serif;
-    background:var(--navy);
-    color:var(--ink);
-  }
+  body{ margin:0; font-family:'Inter',-apple-system,Helvetica,Arial,sans-serif; background:var(--navy); color:var(--ink); }
   button,input{font:inherit}
   button{cursor:pointer}
   h1,h2,h3,p{margin:0}
-
-  .app{ max-width:1440px; margin:0 auto; padding:0 0 32px; }
-
-  .topbar{
-    background:var(--navy-soft);
-    border-bottom:2px solid var(--cyan);
-    padding:15px 24px;
-    display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap;
+  a{color:inherit}
+  [hidden]{display:none !important}
+  a:focus-visible, button:focus-visible, input:focus-visible{
+    outline:2.5px solid var(--cyan-bright); outline-offset:2px; border-radius:2px;
   }
-  .eyebrow{
-    font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.08em;
-    color:var(--cyan); text-transform:uppercase; margin-bottom:4px;
-  }
-  h1{
-    font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:21px;
-    color:#FFFFFF; text-transform:uppercase; letter-spacing:0.01em;
-  }
-  .subtitle{ margin-top:4px; color:var(--cyan-soft); font-size:12.5px; max-width:580px; line-height:1.5; }
-  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .shell{ width:100%; max-width:var(--content-max); margin-inline:auto; padding-inline:var(--gutter); }
 
+  /* ================================================================
+     BRIEF SCREEN
+     ================================================================ */
+  .brief{ background:var(--navy); min-height:100vh; padding-block:clamp(32px,6vw,60px); position:relative; overflow:hidden; }
+  .brief-motif{ position:absolute; top:6%; right:-4%; width:32%; height:66%; opacity:0.3; pointer-events:none; }
+  .brief-inner{ position:relative; z-index:1; }
+  .brief-masthead{
+    display:flex; align-items:baseline; justify-content:space-between; flex-wrap:wrap;
+    gap:8px 20px; margin-bottom:clamp(24px,4vw,40px);
+    font-family:'IBM Plex Mono',monospace; font-size:var(--fs-micro);
+    letter-spacing:0.08em; text-transform:uppercase; color:var(--cyan-bright);
+  }
+  .brief-eyebrow{
+    font-family:'IBM Plex Mono',monospace; font-size:var(--fs-xs); font-weight:600;
+    letter-spacing:0.1em; text-transform:uppercase; color:var(--cyan-bright); margin-bottom:8px;
+  }
+  .brief h1{
+    font-family:'Newsreader',Georgia,serif; font-weight:600; font-size:clamp(2.1rem,1.5rem+2.7vw,3.3rem);
+    color:#F5F4F1; line-height:1.05; letter-spacing:-0.015em; max-width:16ch;
+  }
+  .brief-lede{ margin-top:14px; color:var(--cyan-soft); font-size:var(--fs-body); line-height:1.65; max-width:62ch; }
+
+  .brief-col{ display:grid; grid-template-columns:1fr; gap:clamp(18px,2.4vw,28px); margin-top:clamp(26px,3.5vw,38px); max-width:74ch; }
+
+  .prose{ color:var(--cyan-soft); font-size:var(--fs-sm); line-height:1.65; }
+  .prose p + p{ margin-top:10px; }
+
+  /* NYT-style marginal callouts: serif pull-quote for the abstraction rule,
+     a plain note box for the boundary statement */
+  .callout{ border-left:3px solid var(--cyan-bright); padding:4px 0 4px 18px; }
+  .callout-label{
+    font-family:'IBM Plex Mono',monospace; font-size:var(--fs-micro); letter-spacing:0.08em;
+    text-transform:uppercase; color:var(--cyan-bright); margin-bottom:6px;
+  }
+  .callout-quote{
+    font-family:'Newsreader',Georgia,serif; font-style:italic; font-weight:400;
+    font-size:clamp(1.05rem,0.95rem+0.5vw,1.3rem); color:#F0EFEC; line-height:1.5;
+  }
+  .callout-note{ color:var(--cyan-soft); font-size:var(--fs-sm); line-height:1.6; }
+
+  .task-line{
+    font-family:'Newsreader',Georgia,serif; font-style:italic; font-weight:500;
+    font-size:clamp(1.1rem,1rem+0.5vw,1.4rem); color:#F5F4F1; line-height:1.5; max-width:52ch;
+  }
+
+  .trace-list{ list-style:none; margin:10px 0 0; padding:0; display:grid; gap:7px; }
+  .trace-list li{
+    display:flex; gap:10px; align-items:baseline; color:var(--cyan-soft); font-size:var(--fs-xs); line-height:1.5;
+  }
+  .trace-list li::before{ content:"→"; color:var(--cyan-bright); font-family:'IBM Plex Mono',monospace; flex-shrink:0; }
+
+  .pool-note{
+    color:var(--ink-faint); background:#161821; border:1px solid #262931; border-radius:10px;
+    padding:12px 15px; font-size:var(--fs-xs); line-height:1.55; color:var(--cyan-soft);
+  }
+
+  .brief-cta{ margin-top:30px; display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+
+  /* ================================================================
+     SHARED BUTTONS
+     ================================================================ */
   .btn{
     border:1.5px solid var(--line); background:var(--card); color:var(--ink);
-    padding:8px 14px; border-radius:8px; font-weight:600; font-size:12.5px;
+    padding:10px 18px; border-radius:8px; font-weight:600; font-size:13px;
     transition:transform .12s ease, border-color .12s ease;
   }
   .btn:hover{ border-color:var(--cyan); transform:translateY(-1px); }
   .btn:active{ transform:translateY(0) scale(.98); }
-  .btn.primary{ background:var(--cyan); color:#062230; border-color:var(--cyan); }
+  .btn.primary{ background:var(--cyan-bright); color:#062230; border-color:var(--cyan-bright); }
   .btn.ghost{ background:transparent; color:#E7ECF1; border-color:#333944; }
-  .btn.ghost:hover{ border-color:var(--cyan); }
+  .btn.ghost:hover{ border-color:var(--cyan-bright); }
   .btn.full{width:100%}
   .btn.small{ padding:6px 10px; font-size:11.5px; }
   .btn:disabled{ opacity:.4; cursor:not-allowed; transform:none; }
 
+  /* ================================================================
+     TOOL SCREEN
+     ================================================================ */
+  .app{ max-width:1440px; margin:0 auto; padding:0 0 32px; }
+  .topbar{
+    background:var(--navy); border-bottom:2px solid var(--cyan-bright); padding:15px 24px;
+    display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap;
+  }
+  .eyebrow{ font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.08em; color:var(--cyan-bright); text-transform:uppercase; margin-bottom:4px; }
+  .topbar h1{ font-family:'Inter',sans-serif; font-weight:700; font-size:16.5px; color:#FFFFFF; letter-spacing:-0.005em; }
+  .subtitle{ margin-top:4px; color:var(--cyan-soft); font-size:12.5px; max-width:600px; line-height:1.5; }
+  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
   .badge{
-    display:inline-flex; align-items:center; gap:6px; padding:6px 11px;
-    border-radius:999px; background:var(--cyan-faint); color:#0E5C79;
-    font-size:11.5px; font-weight:700; font-family:'IBM Plex Mono',monospace;
+    display:inline-flex; align-items:center; gap:6px; padding:6px 11px; border-radius:999px;
+    background:var(--cyan-faint); color:#0E5C79; font-size:11.5px; font-weight:700; font-family:'IBM Plex Mono',monospace;
   }
 
   .content{ padding:18px 24px 0; background:var(--paper); }
-  .layout{ display:grid; grid-template-columns:220px 1fr; gap:16px; align-items:start; }
+  .layout{ display:grid; grid-template-columns:230px 1fr; gap:16px; align-items:start; }
 
   .card{ background:var(--card); border:1px solid var(--line); border-radius:12px; padding:13px; }
   .sidebar{display:flex;flex-direction:column;gap:13px}
-  .sidebar h3{ font-family:'Barlow Condensed',sans-serif; font-size:15px; font-weight:700; text-transform:uppercase; }
+  .sidebar h3{ font-family:'Inter',sans-serif; font-size:13.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.01em; }
 
   .legend{display:grid;gap:8px;font-size:12.5px;margin-top:8px}
   .legend-row{display:flex;gap:9px;align-items:center}
   .symbol{ flex-shrink:0; border:1.5px solid var(--ink); }
-  .symbol.action{width:26px;height:16px;border-radius:4px}
-  .symbol.initial{width:13px;height:13px;border-radius:50%;background:var(--ink);border:none}
-  .symbol.decision{width:14px;height:14px;background:var(--ink);clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%);border:none}
-  .symbol.final{width:14px;height:14px;border-radius:50%;position:relative}
+  .symbol.action{width:24px;height:15px;border-radius:4px}
+  .symbol.initial{width:12px;height:12px;border-radius:50%;background:var(--ink);border:none}
+  .symbol.decision{width:13px;height:13px;background:var(--ink);clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%);border:none}
+  .symbol.final{width:13px;height:13px;border-radius:50%;position:relative}
   .symbol.final::after{content:"";position:absolute;inset:2.5px;border-radius:50%;background:var(--ink)}
 
   .section-rule{border-top:1px solid var(--line);padding-top:11px}
   .stack{display:grid;gap:7px}
   .help{font-size:11.5px;color:var(--ink-muted);line-height:1.5}
 
+  .pool-card{
+    display:block; width:100%; text-align:left; background:var(--paper); border:1.5px solid var(--line-strong);
+    border-radius:8px; padding:9px 11px; font-size:12px; font-weight:500; color:var(--ink); line-height:1.3;
+    transition:border-color .12s ease, transform .12s ease;
+  }
+  .pool-card:hover{ border-color:var(--cyan); transform:translateY(-1px); }
+  .pool-list{ display:grid; gap:7px; }
+  .pool-empty{ font-size:11.5px; color:var(--ink-faint); font-style:italic; }
+
   .workspace-wrap{display:grid;gap:8px}
   .workspace-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
   #workspace{
-    position:relative; min-height:560px; overflow:hidden;
-    border:1px solid var(--line); border-radius:12px; background:var(--card);
-    background-image:radial-gradient(var(--line) 1px, transparent 1px);
-    background-size:28px 28px;
-    touch-action:none;
+    position:relative; min-height:560px; overflow:hidden; border:1px solid var(--line); border-radius:12px;
+    background:var(--card); background-image:radial-gradient(var(--line) 1px, transparent 1px);
+    background-size:28px 28px; touch-action:none;
   }
   #connectionLayer,#nodeLayer{position:absolute;inset:0;width:100%;height:100%}
   #nodeLayer{pointer-events:none}
@@ -112,55 +185,52 @@
 
   .builder-node{
     position:absolute; display:flex; align-items:center; justify-content:center;
-    width:126px; min-height:42px; padding:7px 10px;
-    border:1.5px solid var(--ink); border-radius:9px;
-    background:var(--card); color:var(--ink); text-align:center;
-    font-size:12.5px; font-weight:500; line-height:1.25;
-    user-select:none; z-index:2;
-    transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+    width:132px; min-height:44px; padding:7px 10px; border:1.5px solid var(--ink); border-radius:9px;
+    background:var(--card); color:var(--ink); text-align:center; font-size:12px; font-weight:500; line-height:1.25;
+    user-select:none; z-index:2; transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease, left .3s ease, top .3s ease;
   }
+  .builder-node.dragging{ transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease; }
   .builder-node .body{cursor:grab}
   .builder-node:hover{ transform:scale(1.03); box-shadow:0 3px 10px rgba(10,10,13,0.08); }
   .builder-node.dragging{cursor:grabbing; box-shadow:0 6px 16px rgba(10,10,13,0.14);}
   .builder-node.correct{ border-color:var(--success); background:var(--success-bg); }
   .builder-node.wrong{ border-color:var(--danger); background:var(--danger-bg); }
+  .builder-node.flagged{ border-color:var(--warning); background:var(--warning-bg); }
 
-  .builder-node.initial,.builder-node.final{
-    width:38px; min-height:38px; padding:0; border-radius:999px;
-  }
+  .builder-node.initial,.builder-node.final{ width:38px; min-height:38px; padding:0; border-radius:999px; }
   .builder-node.initial{background:var(--ink);color:#fff;font-size:10.5px}
-  .builder-node.final::after{
-    content:""; width:18px; height:18px; border-radius:999px; background:var(--ink);
-  }
-  .builder-node.decision{
-    width:64px; height:64px; min-height:64px; border:none; background:transparent; padding:0;
-  }
-  .builder-node.merge{
-    width:34px; height:34px; min-height:34px; border:none; background:transparent; padding:0;
-  }
+  .builder-node.final::after{ content:""; width:18px; height:18px; border-radius:999px; background:var(--ink); }
+  .builder-node.decision{ width:66px; height:66px; min-height:66px; border:none; background:transparent; padding:0; }
   .diamond-shape{ position:absolute; inset:0; z-index:0; }
   .diamond-shape polygon{ fill:var(--card); stroke:var(--ink); stroke-width:2; vector-effect:non-scaling-stroke; }
   .builder-node.correct .diamond-shape polygon{ stroke:var(--success); fill:var(--success-bg); }
   .builder-node.wrong .diamond-shape polygon{ stroke:var(--danger); fill:var(--danger-bg); }
   .builder-node .body{ position:relative; z-index:1; }
   .node-caption{
-    position:absolute; top:100%; left:50%; transform:translateX(-50%);
-    margin-top:5px; width:104px; text-align:center; pointer-events:none;
-    font-size:12px; color:var(--ink); line-height:1.25; z-index:1;
+    position:absolute; top:100%; left:50%; transform:translateX(-50%); margin-top:5px; width:112px;
+    text-align:center; pointer-events:none; font-size:11.5px; color:var(--ink); line-height:1.25; z-index:1;
   }
+
+  .node-remove{
+    position:absolute; top:-8px; left:-8px; width:18px; height:18px; border-radius:50%;
+    background:var(--card); border:1.5px solid var(--line-strong); color:var(--ink-muted);
+    display:flex; align-items:center; justify-content:center; font-size:11px; line-height:1; z-index:5;
+    pointer-events:auto; cursor:pointer;
+  }
+  .node-remove:hover{ border-color:var(--danger); color:var(--danger); }
 
   .status-icon{
     position:absolute; top:-9px; right:-9px; width:20px; height:20px; border-radius:50%;
     display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700;
-    color:#fff; z-index:3;
+    color:#fff; z-index:3; border:2px solid var(--card);
   }
   .status-icon.correct{background:var(--success)}
   .status-icon.wrong{background:var(--danger)}
+  .status-icon.flagged{background:var(--warning)}
 
   .handle{
-    position:absolute; width:9px; height:9px; border-radius:50%;
-    background:var(--cyan); border:1.5px solid #fff; opacity:.28;
-    cursor:crosshair; z-index:4; transition:opacity .12s ease, transform .12s ease;
+    position:absolute; width:9px; height:9px; border-radius:50%; background:var(--cyan);
+    border:1.5px solid #fff; opacity:.28; cursor:crosshair; z-index:4; transition:opacity .12s ease, transform .12s ease;
   }
   .builder-node:hover .handle{ opacity:.85; }
   .handle:hover{ transform:scale(1.5); opacity:1; }
@@ -172,20 +242,32 @@
   .edge-line{ fill:none; stroke:var(--ink); stroke-width:2.2; marker-end:url(#builderArrow); }
   .edge-line:hover{ stroke:var(--danger); stroke-width:3; }
   .edge-line.removing{ stroke:var(--danger); }
-  .edge-label{ fill:#0E5C79; font-size:12.5px; font-weight:700; font-family:'IBM Plex Mono',monospace; }
+  .edge-label{ fill:#0E5C79; font-size:12px; font-weight:700; font-family:'IBM Plex Mono',monospace; }
   .answer-line{ fill:none; stroke:var(--success); stroke-width:2; stroke-dasharray:2,5; }
   .drag-line{ fill:none; stroke:var(--cyan); stroke-width:2.2; stroke-dasharray:2,5; }
 
+  .guard-picker{
+    position:absolute; z-index:10; background:var(--card); border:1.5px solid var(--cyan);
+    border-radius:10px; padding:8px; box-shadow:0 8px 24px rgba(10,10,13,0.18);
+    display:flex; flex-direction:column; gap:5px; min-width:150px;
+  }
+  .guard-picker .gp-label{ font-size:10.5px; color:var(--ink-muted); font-family:'IBM Plex Mono',monospace; text-transform:uppercase; letter-spacing:0.04em; padding:0 2px 2px; }
+  .guard-picker button{
+    border:1.5px solid var(--line-strong); background:var(--paper); color:var(--ink);
+    padding:7px 10px; border-radius:6px; font-size:12px; font-weight:600; text-align:left;
+  }
+  .guard-picker button:hover{ border-color:var(--cyan); background:var(--cyan-faint); }
+  .guard-picker .gp-cancel{ color:var(--ink-faint); font-weight:500; border:none; background:none; text-align:center; padding:4px; }
+
   .hint-text{ font-size:12.5px; color:var(--ink-muted); }
-  .helper-strip{ display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; font-size:12.5px; color:var(--ink-muted); }
 
   .feedback{
-    margin-top:12px; padding:11px 14px; border-radius:10px;
-    background:var(--card); border:1px solid var(--line); border-left:3px solid var(--cyan);
-    font-size:13px;
+    margin-top:12px; padding:11px 14px; border-radius:10px; background:var(--card);
+    border:1px solid var(--line); border-left:3px solid var(--cyan); font-size:13px;
   }
   .feedback.correct{ border-left-color:var(--success); background:var(--success-bg); }
   .feedback.wrong{ border-left-color:var(--danger); background:var(--danger-bg); }
+  .feedback.flagged{ border-left-color:var(--warning); background:var(--warning-bg); }
   .feedback p+p{margin-top:5px;color:var(--ink-muted);font-size:12.5px;line-height:1.5}
   .feedback-head{ display:flex; align-items:center; gap:8px; font-weight:700; font-size:13px; }
 
@@ -195,15 +277,25 @@
   }
   .metric{ display:flex; align-items:baseline; gap:6px; }
   .metric-label{ font-size:11px; color:var(--ink-muted); font-family:'IBM Plex Mono',monospace; text-transform:uppercase; }
-  .metric-value{ font-size:14px; font-weight:700; font-family:'Barlow Condensed',sans-serif; }
+  .metric-value{ font-size:15px; font-weight:700; font-family:'Inter',sans-serif; }
+
+  .reflection{
+    margin-top:16px; padding:16px 18px; border-radius:12px; background:var(--navy); color:#E7ECF1;
+  }
+  .reflection .callout-label{ margin-bottom:8px; }
+  .reflection p{ font-size:var(--fs-sm); line-height:1.6; color:var(--cyan-soft); }
+  .reflection p + p{ margin-top:10px; }
+  .reflection .not-graded{
+    display:inline-block; margin-top:12px; font-family:'IBM Plex Mono',monospace; font-size:var(--fs-micro);
+    color:var(--ink-faint); letter-spacing:0.02em;
+  }
 
   dialog{ border:1px solid var(--line); border-radius:16px; padding:0; background:var(--card); color:var(--ink); }
   dialog::backdrop{background:rgba(10,10,13,.55)}
   .dialog-body{width:min(92vw,400px);padding:22px;display:grid;gap:16px}
   label{display:grid;gap:6px;font-weight:600;font-size:13.5px}
   input[type="password"]{
-    width:100%; border:1.5px solid var(--line); border-radius:9px;
-    padding:10px 12px; background:var(--paper); color:var(--ink);
+    width:100%; border:1.5px solid var(--line); border-radius:9px; padding:10px 12px; background:var(--paper); color:var(--ink);
   }
   input[type="password"]:focus{ outline:2px solid var(--cyan); outline-offset:1px; border-color:var(--cyan); }
   .error{color:var(--danger);font-size:13px;min-height:1.2em}
@@ -220,16 +312,88 @@
 </style>
 </head>
 <body>
-<div class="app">
+
+<section id="briefScreen" class="brief">
+  <svg class="brief-motif" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <g fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.7">
+      <g style="stroke:var(--cyan-bright)" stroke-width="1.4">
+        <circle cx="30" cy="100" r="7" style="fill:var(--cyan-bright)" stroke="none"/>
+        <path d="M37 100H78"/>
+        <rect x="78" y="76" width="60" height="48" rx="5"/>
+        <path d="M138 100H168"/>
+        <rect x="168" y="76" width="60" height="48" rx="5"/>
+        <path d="M228 100H256"/>
+        <path d="M284 76 312 100 284 124 256 100Z"/>
+        <path d="M312 100 336 66M312 100 336 134"/>
+        <rect x="336" y="48" width="48" height="36" rx="4"/>
+        <rect x="336" y="116" width="48" height="36" rx="4"/>
+        <circle cx="393" cy="100" r="9"/>
+        <circle cx="393" cy="100" r="3.5" style="fill:var(--cyan-bright)" stroke="none"/>
+      </g>
+    </g>
+  </svg>
+
+  <div class="brief-inner shell">
+    <div class="brief-masthead">
+      <span>Stevens Institute of Technology</span>
+      <span>SYS 611 · Fall 2026</span>
+    </div>
+    <p class="brief-eyebrow">Building Activity Diagrams</p>
+    <h1>The penalty kick</h1>
+    <p class="brief-lede">A penalty kick is about to be taken during a tied match. The ball has been placed at the penalty mark. The goalkeeper is positioned at the goal, and the kicker waits to kick the ball. The referee checks that the players are ready and signals for the kick to proceed.</p>
+
+    <div class="brief-col">
+      <div class="prose">
+        <p>The kicker begins the run-up and strikes the ball. From this point, several outcomes are possible. The ball may travel outside the goal area, it may be stopped by the goalkeeper, or it may enter the goal. Once the outcome of the attempt has been determined, the result is recorded and the penalty-kick procedure concludes.</p>
+      </div>
+
+      <div>
+        <p class="task-line">Develop an activity diagram sufficient to reproduce the possible logical paths described above. Choose the control structures the behavior actually requires.</p>
+      </div>
+
+      <div class="callout">
+        <p class="callout-label">Modeling Boundary</p>
+        <p class="callout-note">Treat the penalty attempt as the system of interest. The model begins when the referee authorizes the kick and ends after the outcome has been classified and recorded. Actions before authorization, and events after the result is recorded, are outside the model boundary.</p>
+      </div>
+
+      <div class="callout">
+        <p class="callout-label">Abstraction Rule</p>
+        <p class="callout-quote">Model control flow, not physical dynamics.</p>
+        <p class="callout-note" style="margin-top:8px">The ball's continuous trajectory is physical behavior, outside the scope of this diagram. </p>
+      </div>
+
+      <div>
+        <p class="callout-label" style="color:var(--ink-faint)">Before you check your work, trace these three executions through your diagram</p>
+        <ul class="trace-list">
+          <li>An attempt that misses the target entirely</li>
+          <li>An on-target attempt that the goalkeeper stops</li>
+          <li>An on-target attempt that results in a goal</li>
+        </ul>
+      </div>
+
+      <div class="pool-note">
+        The workspace starts empty. You'll build your model from a pool of candidate cards. Not every card describes something that belongs in an activity diagram at this level of abstraction. Deciding what to include is part of the exercise.
+      </div>
+    </div>
+
+    <div class="brief-cta">
+      <button id="beginButton" class="btn primary" type="button">Begin building</button>
+      <span class="hint-text" style="color:var(--ink-faint)">Have fun!.</span>
+    </div>
+  </div>
+</section>
+
+<div id="toolScreen" class="app" hidden>
 
   <div class="topbar">
     <div>
       <div class="eyebrow">SYS 611 &middot; Diagram Builder</div>
-      <h1>Reconstruct the penalty-kick process</h1>
-      <p class="subtitle">Drag from the small dots on each block's edge to connect it to another block. Assessment is based on the direction and logic of your connections &mdash; layout doesn't matter.</p>
+      <h1>Model the penalty-kick process</h1>
+      <p class="subtitle">Add cards from the pool to the workspace, then drag from a block's edge dots to connect it to another block. Not every card belongs &mdash; leaving one in the pool is a valid choice.</p>
     </div>
     <div class="row">
       <span class="badge" id="connBadge">0 connections</span>
+      <button id="briefButton" class="btn ghost" type="button">Scenario brief</button>
       <button id="answerButton" class="btn ghost" type="button">Instructor answer</button>
     </div>
   </div>
@@ -242,18 +406,24 @@
           <div class="legend">
             <div class="legend-row"><span class="symbol initial"></span><span>Initial node</span></div>
             <div class="legend-row"><span class="symbol action"></span><span>Action</span></div>
-            <div class="legend-row"><span class="symbol decision"></span><span>Decision or merge</span></div>
+            <div class="legend-row"><span class="symbol decision"></span><span>Decision</span></div>
             <div class="legend-row"><span class="symbol final"></span><span>Activity final</span></div>
           </div>
         </div>
 
         <div class="section-rule">
-          <p class="help">Drag a block's body to move it. Drag from an edge dot to another block to connect it. Click a connection line to remove it.</p>
+          <p class="help">Click a card below to add it to the workspace. Drag from an edge dot to connect blocks &mdash; a decision will ask you to choose a guard. Click a connection or the × on a block to remove it.</p>
+        </div>
+
+        <div class="section-rule">
+          <h3>Candidate cards</h3>
+          <div class="pool-list" id="poolList"></div>
         </div>
 
         <div class="section-rule stack">
           <button id="hintButton" class="btn full" type="button">Get a hint</button>
-          <button id="resetButton" class="btn full" type="button">Shuffle and reset</button>
+          <button id="tidyButton" class="btn full" type="button">Tidy layout</button>
+          <button id="resetButton" class="btn full" type="button">Reset workspace</button>
         </div>
 
         <button id="checkButton" class="btn primary full" type="button">Check process logic</button>
@@ -261,7 +431,7 @@
 
       <div class="workspace-wrap">
         <div class="workspace-head">
-          <h3 style="font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;text-transform:uppercase;">Student workspace</h3>
+          <h3 style="font-family:'Inter',sans-serif;font-size:14px;font-weight:700;">Student workspace</h3>
           <span class="hint-text" id="hintsUsedText">0 hints used</span>
         </div>
 
@@ -289,7 +459,13 @@
 
     <div id="feedback" class="feedback" aria-live="polite">
       <div class="feedback-head"><span>Your task</span></div>
-      <p>Connect the blocks so every possible penalty-kick outcome follows the correct causal path.</p>
+      <p>Add the cards you think belong, connect them, and choose a guard label at each decision. Every possible outcome should reach a valid end.</p>
+    </div>
+
+    <div id="reflection" class="reflection" hidden>
+      <p class="callout-label">Looking ahead</p>
+      <p>What information about the real penalty kick did you deliberately leave out of this model? </p>
+      <span class="not-graded">This activity is not graded. </span>
     </div>
 
     <div class="metrics">
@@ -302,8 +478,8 @@
   <dialog id="passwordDialog">
     <div class="dialog-body">
       <div>
-        <h3 style="font-family:'Barlow Condensed',sans-serif;font-size:19px;font-weight:700;">Instructor access</h3>
-        <p class="help" style="margin-top:6px">Enter the instructor password to overlay the correct connections on your diagram.</p>
+        <h3 style="font-family:'Inter',sans-serif;font-size:16.5px;font-weight:700;">Instructor access</h3>
+        <p class="help" style="margin-top:6px">Enter the instructor password to place the reference model on your workspace and overlay the correct connections.</p>
       </div>
       <label>
         Password
@@ -319,7 +495,12 @@
 </div>
 
 <script>
-  const INSTRUCTOR_PASSWORD = 'stevens611';
+  const INSTRUCTOR_PASSWORD = atob('c3RldmVuczYxMQ==');
+
+  const briefScreen = document.getElementById('briefScreen');
+  const toolScreen = document.getElementById('toolScreen');
+  const beginButton = document.getElementById('beginButton');
+  const briefButton = document.getElementById('briefButton');
 
   const workspace = document.getElementById('workspace');
   const nodeLayer = document.getElementById('nodeLayer');
@@ -329,92 +510,200 @@
   const dragLineLayer = document.getElementById('dragLineLayer');
   const connBadge = document.getElementById('connBadge');
   const feedback = document.getElementById('feedback');
+  const reflection = document.getElementById('reflection');
   const modelStatus = document.getElementById('modelStatus');
   const attemptsValue = document.getElementById('attemptsValue');
   const hintsValue = document.getElementById('hintsValue');
   const hintsUsedText = document.getElementById('hintsUsedText');
+  const poolList = document.getElementById('poolList');
   const passwordDialog = document.getElementById('passwordDialog');
   const enteredPassword = document.getElementById('enteredPassword');
   const passwordFeedback = document.getElementById('passwordFeedback');
 
   const definitions = [
-    { id: 'start', label: 'Start', type: 'initial' },
-    { id: 'wait', label: 'Wait for referee signal', type: 'action' },
-    { id: 'approach', label: 'Approach ball', type: 'action' },
-    { id: 'kick', label: 'Kick ball', type: 'action' },
-    { id: 'onTarget', label: 'Shot on target?', type: 'decision' },
-    { id: 'saved', label: 'Goalkeeper saves?', type: 'decision' },
-    { id: 'miss', label: 'Record miss', type: 'action' },
-    { id: 'save', label: 'Record save', type: 'action' },
-    { id: 'goal', label: 'Record goal', type: 'action' },
-    { id: 'merge', label: '', type: 'merge' },
-    { id: 'end', label: 'End', type: 'final' }
+    { id: 'start', label: 'Referee authorizes the kick', type: 'initial' },
+    { id: 'takeShot', label: 'Kicker takes the shot', type: 'action' },
+    { id: 'determineTarget', label: 'Is the shot on target?', type: 'decision', guards: ['on target', 'off target'] },
+    { id: 'classifyMiss', label: 'Classify as miss', type: 'action' },
+    { id: 'determineSaved', label: 'Does the goalkeeper stop it?', type: 'decision', guards: ['saved', 'not saved'] },
+    { id: 'classifySave', label: 'Classify as save', type: 'action' },
+    { id: 'classifyGoal', label: 'Classify as goal', type: 'action' },
+    { id: 'recordOutcome', label: 'Record outcome', type: 'action' },
+    { id: 'end', label: 'End', type: 'final' },
+    { id: 'ballTrajectory', label: 'Ball travels through the air', type: 'action', isDistractor: true, reason: "This describes the ball's continuous physical trajectory, not a discrete action or condition." },
+    { id: 'windEffect', label: 'Wind affects the ball\u2019s path', type: 'action', isDistractor: true, reason: 'An environmental physical factor, not a discrete, observable state change in the process.' },
+    { id: 'bodyShape', label: "Goalkeeper reads the kicker's body shape", type: 'action', isDistractor: true, reason: "An unobservable, continuous predictive process rather than a determinable discrete state." },
+    { id: 'warmup', label: 'Player warms up on the sideline', type: 'action', isDistractor: true, reason: 'Occurs before the referee authorizes the kick — outside the stated model boundary.' },
+    { id: 'crowdReacts', label: 'Crowd reacts to the result', type: 'action', isDistractor: true, reason: 'Occurs after the outcome is recorded — outside the stated model boundary.' },
   ];
+
+  const byId = id => definitions.find(d => d.id === id);
 
   const correctEdges = [
-    ['start', 'wait'], ['wait', 'approach'], ['approach', 'kick'], ['kick', 'onTarget'],
-    ['onTarget', 'miss'], ['onTarget', 'saved'], ['saved', 'save'], ['saved', 'goal'],
-    ['miss', 'merge'], ['save', 'merge'], ['goal', 'merge'], ['merge', 'end']
+    { source: 'start', target: 'takeShot' },
+    { source: 'takeShot', target: 'determineTarget' },
+    { source: 'determineTarget', target: 'classifyMiss', label: 'off target' },
+    { source: 'determineTarget', target: 'determineSaved', label: 'on target' },
+    { source: 'determineSaved', target: 'classifySave', label: 'saved' },
+    { source: 'determineSaved', target: 'classifyGoal', label: 'not saved' },
+    { source: 'classifyMiss', target: 'recordOutcome' },
+    { source: 'classifySave', target: 'recordOutcome' },
+    { source: 'classifyGoal', target: 'recordOutcome' },
+    { source: 'recordOutcome', target: 'end' },
+  ];
+  const structKey = (s, t) => `${s}>${t}`;
+  const correctByKey = new Map(correctEdges.map(e => [structKey(e.source, e.target), e]));
+
+  const traces = [
+    { name: 'the attempt that misses the target', steps: [
+      ['start', 'takeShot'], ['takeShot', 'determineTarget'], ['determineTarget', 'classifyMiss'],
+      ['classifyMiss', 'recordOutcome'], ['recordOutcome', 'end'] ] },
+    { name: 'the on-target attempt the goalkeeper stops', steps: [
+      ['start', 'takeShot'], ['takeShot', 'determineTarget'], ['determineTarget', 'determineSaved'],
+      ['determineSaved', 'classifySave'], ['classifySave', 'recordOutcome'], ['recordOutcome', 'end'] ] },
+    { name: 'the on-target attempt that results in a goal', steps: [
+      ['start', 'takeShot'], ['takeShot', 'determineTarget'], ['determineTarget', 'determineSaved'],
+      ['determineSaved', 'classifyGoal'], ['classifyGoal', 'recordOutcome'], ['recordOutcome', 'end'] ] },
   ];
 
-  const edgeLabels = {
-    'onTarget>miss': '[no]', 'onTarget>saved': '[yes]',
-    'saved>save': '[yes]', 'saved>goal': '[no]'
-  };
-
   let connections = [];
+  let onCanvas = new Set();
+  let poolOrder = [];
   let attempts = 0;
   let hintsUsed = 0;
   let showAnswer = false;
   let connectDrag = null;
   let bodyDrag = null;
+  let nodesInitialized = false;
+  let lastHintTrace = null;
+  let hintLevelForTrace = 0;
 
-  function randomPosition(index) {
+  function shuffledIndices(n) {
+    const arr = Array.from({ length: n }, (_, i) => i);
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  beginButton.addEventListener('click', () => {
+    briefScreen.hidden = true;
+    toolScreen.hidden = false;
+    if (!nodesInitialized) {
+      initWorkspace();
+      nodesInitialized = true;
+    } else {
+      drawConnections();
+    }
+  });
+  briefButton.addEventListener('click', () => {
+    toolScreen.hidden = true;
+    briefScreen.hidden = false;
+    beginButton.textContent = nodesInitialized ? 'Continue building' : 'Begin building';
+  });
+
+  function initWorkspace() {
+    poolOrder = shuffledIndices(definitions.length).map(i => definitions[i].id);
+    renderPool();
+  }
+
+  function renderPool() {
+    poolList.innerHTML = '';
+    const available = poolOrder.filter(id => !onCanvas.has(id));
+    if (!available.length) {
+      poolList.innerHTML = '<p class="pool-empty">All cards placed.</p>';
+      return;
+    }
+    available.forEach(id => {
+      const def = byId(id);
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'pool-card';
+      btn.textContent = def.label;
+      btn.addEventListener('click', () => addNodeToCanvas(id));
+      poolList.appendChild(btn);
+    });
+  }
+
+  function nextSlot() { return onCanvas.size; }
+  function slotPosition(slot) {
     const width = Math.max(workspace.clientWidth, 560);
     const cols = 4;
-    const col = index % cols;
-    const row = Math.floor(index / cols);
+    const col = slot % cols;
+    const row = Math.floor(slot / cols);
     const spacing = Math.max(150, (width - 190) / cols);
     return { x: 18 + col * spacing + Math.random() * 18, y: 25 + row * 165 + Math.random() * 24 };
   }
 
-  function createNodes() {
-    nodeLayer.innerHTML = '';
-    definitions.forEach((definition, index) => {
-      const node = document.createElement('div');
-      node.className = `builder-node ${definition.type}`;
-      node.dataset.id = definition.id;
+  function addNodeToCanvas(id) {
+    if (onCanvas.has(id)) return;
+    const def = byId(id);
+    const node = document.createElement('div');
+    node.className = `builder-node ${def.type}`;
+    node.dataset.id = def.id;
 
-      if (definition.type === 'decision' || definition.type === 'merge') {
-        node.insertAdjacentHTML('beforeend',
-          '<svg class="diamond-shape" viewBox="0 0 100 100" preserveAspectRatio="none"><polygon points="50,4 96,50 50,96 4,50"/></svg>');
-      }
-      if (definition.type === 'decision' && definition.label) {
-        const caption = document.createElement('div');
-        caption.className = 'node-caption';
-        caption.textContent = definition.label;
-        node.appendChild(caption);
-      }
+    if (def.type === 'decision') {
+      node.insertAdjacentHTML('beforeend',
+        '<svg class="diamond-shape" viewBox="0 0 100 100" preserveAspectRatio="none"><polygon points="50,4 96,50 50,96 4,50"/></svg>');
+      const caption = document.createElement('div');
+      caption.className = 'node-caption';
+      caption.textContent = def.label;
+      node.appendChild(caption);
+    }
 
-      const body = document.createElement('div');
-      body.className = 'body';
-      body.textContent = (definition.type === 'decision' || definition.type === 'merge') ? '' : definition.label;
-      node.appendChild(body);
+    const body = document.createElement('div');
+    body.className = 'body';
+    body.textContent = def.type === 'decision' ? '' : def.label;
+    node.appendChild(body);
 
-      ['top', 'right', 'bottom', 'left'].forEach(side => {
-        const h = document.createElement('div');
-        h.className = 'handle ' + side;
-        h.dataset.side = side;
-        h.addEventListener('pointerdown', startConnect);
-        node.appendChild(h);
-      });
+    const remove = document.createElement('button');
+    remove.type = 'button';
+    remove.className = 'node-remove';
+    remove.setAttribute('aria-label', `Remove ${def.label} from workspace`);
+    remove.textContent = '\u00d7';
+    remove.addEventListener('pointerdown', e => e.stopPropagation());
+    remove.addEventListener('click', () => removeNodeFromCanvas(id));
+    node.appendChild(remove);
 
-      const position = randomPosition(index);
-      node.style.left = `${position.x}px`;
-      node.style.top = `${position.y}px`;
+    ['top', 'right', 'bottom', 'left'].forEach(side => {
+      const h = document.createElement('div');
+      h.className = 'handle ' + side;
+      h.dataset.side = side;
+      h.addEventListener('pointerdown', startConnect);
+      node.appendChild(h);
+    });
 
-      node.addEventListener('pointerdown', startBodyDrag);
-      nodeLayer.appendChild(node);
+    const position = slotPosition(nextSlot());
+    node.style.left = `${position.x}px`;
+    node.style.top = `${position.y}px`;
+    node.addEventListener('pointerdown', startBodyDrag);
+    nodeLayer.appendChild(node);
+
+    onCanvas.add(id);
+    renderPool();
+    requestAnimationFrame(drawConnections);
+  }
+
+  function removeNodeFromCanvas(id) {
+    const node = nodeLayer.querySelector(`[data-id="${id}"]`);
+    if (node) node.remove();
+    onCanvas.delete(id);
+    connections = connections.filter(c => c.source !== id && c.target !== id);
+    updateBadge();
+    renderPool();
+    drawConnections();
+  }
+
+  function tidyLayout() {
+    const ids = Array.from(onCanvas);
+    const shuffled = shuffledIndices(ids.length);
+    ids.forEach((id, i) => {
+      const node = nodeLayer.querySelector(`[data-id="${id}"]`);
+      if (!node) return;
+      const pos = slotPosition(shuffled[i]);
+      node.style.left = `${pos.x}px`;
+      node.style.top = `${pos.y}px`;
     });
     requestAnimationFrame(drawConnections);
   }
@@ -423,12 +712,7 @@
     const node = event.currentTarget.closest('.builder-node');
     const workspaceRect = workspace.getBoundingClientRect();
     const nodeRect = node.getBoundingClientRect();
-    bodyDrag = {
-      node,
-      offsetX: event.clientX - nodeRect.left,
-      offsetY: event.clientY - nodeRect.top,
-      workspaceRect
-    };
+    bodyDrag = { node, offsetX: event.clientX - nodeRect.left, offsetY: event.clientY - nodeRect.top, workspaceRect };
     node.classList.add('dragging');
     document.addEventListener('pointermove', moveBodyDrag);
     document.addEventListener('pointerup', endBodyDrag, { once: true });
@@ -476,16 +760,65 @@
     if (!connectDrag) return;
     const target = document.elementFromPoint(event.clientX, event.clientY);
     const targetNode = target ? target.closest('.builder-node') : null;
-    if (targetNode && targetNode.dataset.id !== connectDrag.sourceId) {
-      const targetId = targetNode.dataset.id;
-      const duplicate = connections.some(e => e[0] === connectDrag.sourceId && e[1] === targetId);
-      if (!duplicate) {
-        connections.push([connectDrag.sourceId, targetId]);
-        updateBadge();
-        drawConnections(true);
-      }
-    }
+    const sourceId = connectDrag.sourceId;
     connectDrag = null;
+    if (!targetNode || targetNode.dataset.id === sourceId) return;
+    const targetId = targetNode.dataset.id;
+    const duplicate = connections.some(e => e.source === sourceId && e.target === targetId);
+    if (duplicate) return;
+
+    const sourceDef = byId(sourceId);
+    if (sourceDef.type === 'decision') {
+      openGuardPicker(sourceId, targetId, event.clientX, event.clientY);
+    } else {
+      addConnection(sourceId, targetId, null);
+    }
+  }
+
+  function openGuardPicker(sourceId, targetId, clientX, clientY) {
+    document.querySelectorAll('.guard-picker').forEach(p => p.remove());
+    const def = byId(sourceId);
+    const workspaceRect = workspace.getBoundingClientRect();
+    const picker = document.createElement('div');
+    picker.className = 'guard-picker';
+    picker.style.left = `${Math.max(4, clientX - workspaceRect.left - 70)}px`;
+    picker.style.top = `${clientY - workspaceRect.top + 12}px`;
+
+    const label = document.createElement('div');
+    label.className = 'gp-label';
+    label.textContent = 'Choose a guard';
+    picker.appendChild(label);
+
+    def.guards.forEach(g => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.textContent = `[${g}]`;
+      btn.addEventListener('click', () => {
+        addConnection(sourceId, targetId, g);
+        picker.remove();
+      });
+      picker.appendChild(btn);
+    });
+
+    const cancel = document.createElement('button');
+    cancel.type = 'button';
+    cancel.className = 'gp-cancel';
+    cancel.textContent = 'Cancel';
+    cancel.addEventListener('click', () => picker.remove());
+    picker.appendChild(cancel);
+
+    workspace.appendChild(picker);
+    setTimeout(() => {
+      document.addEventListener('pointerdown', function onOutside(e) {
+        if (!picker.contains(e.target)) { picker.remove(); document.removeEventListener('pointerdown', onOutside); }
+      });
+    }, 0);
+  }
+
+  function addConnection(source, target, label) {
+    connections.push({ source, target, label });
+    updateBadge();
+    drawConnections(true);
   }
 
   function nodeCenter(id) {
@@ -494,7 +827,6 @@
     const rect = node.getBoundingClientRect();
     return { x: rect.left - workspaceRect.left + rect.width / 2, y: rect.top - workspaceRect.top + rect.height / 2 };
   }
-
   function pathFor(a, b) {
     const midY = a.y + (b.y - a.y) / 2;
     return `M ${a.x} ${a.y} C ${a.x} ${midY}, ${b.x} ${midY}, ${b.x} ${b.y}`;
@@ -503,10 +835,9 @@
   function drawConnections(animateLast) {
     svg.setAttribute('viewBox', `0 0 ${workspace.clientWidth} ${workspace.clientHeight}`);
     connectionLines.innerHTML = '';
-
-    connections.forEach(([source, target], idx) => {
-      const a = nodeCenter(source);
-      const b = nodeCenter(target);
+    connections.forEach((c, idx) => {
+      const a = nodeCenter(c.source);
+      const b = nodeCenter(c.target);
       const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
       path.setAttribute('class', 'edge-line');
       path.setAttribute('d', pathFor(a, b));
@@ -522,25 +853,23 @@
         requestAnimationFrame(() => { path.style.strokeDashoffset = 0; });
       }
 
-      const labelText = edgeLabels[`${source}>${target}`];
-      if (labelText) {
-        const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        label.setAttribute('class', 'edge-label');
-        label.setAttribute('x', String((a.x + b.x) / 2 + 6));
-        label.setAttribute('y', String((a.y + b.y) / 2 - 7));
-        label.textContent = labelText;
-        connectionLines.appendChild(label);
+      if (c.label) {
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('class', 'edge-label');
+        text.setAttribute('x', String((a.x + b.x) / 2 + 6));
+        text.setAttribute('y', String((a.y + b.y) / 2 - 7));
+        text.textContent = `[${c.label}]`;
+        connectionLines.appendChild(text);
       }
     });
-
     if (showAnswer) drawAnswerOverlay();
   }
 
   function drawAnswerOverlay() {
     answerLines.innerHTML = '';
-    correctEdges.forEach(([source, target]) => {
-      const a = nodeCenter(source);
-      const b = nodeCenter(target);
+    correctEdges.forEach(e => {
+      const a = nodeCenter(e.source);
+      const b = nodeCenter(e.target);
       const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
       path.setAttribute('class', 'answer-line');
       path.setAttribute('marker-end', 'url(#answerArrow)');
@@ -563,87 +892,162 @@
     connBadge.textContent = `${connections.length} connection${connections.length === 1 ? '' : 's'}`;
   }
 
-  function edgeKey(e) { return `${e[0]}>${e[1]}`; }
-  function findNodeLabel(id) {
-    const d = definitions.find(item => item.id === id);
-    return d && d.label ? d.label : 'merge point';
+  function submittedMap() {
+    const m = new Map();
+    connections.forEach(c => m.set(structKey(c.source, c.target), c.label || null));
+    return m;
   }
+
+  function evaluate() {
+    const submitted = submittedMap();
+    const distractorsPresent = Array.from(onCanvas).map(byId).filter(d => d.isDistractor);
+
+    const missing = correctEdges.filter(e => !submitted.has(structKey(e.source, e.target)));
+    const extra = connections.filter(c => !correctByKey.has(structKey(c.source, c.target)));
+    const mislabeled = correctEdges.filter(e => {
+      const key = structKey(e.source, e.target);
+      return e.label && submitted.has(key) && submitted.get(key) !== e.label;
+    });
+
+    const ambiguous = [];
+    definitions.filter(d => d.type === 'decision' && onCanvas.has(d.id)).forEach(d => {
+      const out = connections.filter(c => c.source === d.id);
+      const seen = new Map();
+      out.forEach(c => { if (c.label) seen.set(c.label, (seen.get(c.label) || 0) + 1); });
+      if (Array.from(seen.values()).some(n => n > 1)) ambiguous.push(d);
+    });
+
+    const traceResults = traces.map(t => {
+      const broken = t.steps.find(([s, tt]) => {
+        const key = structKey(s, tt);
+        const expected = correctByKey.get(key);
+        if (!submitted.has(key)) return true;
+        if (expected && expected.label && submitted.get(key) !== expected.label) return true;
+        return false;
+      });
+      return { name: t.name, passes: !broken, brokenStep: broken };
+    });
+
+    const allCorrect = distractorsPresent.length === 0 && missing.length === 0 &&
+      extra.length === 0 && mislabeled.length === 0 && ambiguous.length === 0;
+
+    return { distractorsPresent, missing, extra, mislabeled, ambiguous, traceResults, allCorrect };
+  }
+
+  function findNodeLabel(id) { const d = byId(id); return d ? d.label : id; }
 
   function clearStatusIcons() {
     document.querySelectorAll('.status-icon').forEach(n => n.remove());
-    document.querySelectorAll('.builder-node').forEach(n => n.classList.remove('correct', 'wrong'));
+    document.querySelectorAll('.builder-node').forEach(n => n.classList.remove('correct', 'wrong', 'flagged'));
+  }
+  function addStatusIcon(node, type, char) {
+    const icon = document.createElement('div');
+    icon.className = `status-icon ${type}`;
+    icon.textContent = char;
+    icon.setAttribute('role', 'img');
+    icon.setAttribute('aria-label', type === 'correct' ? 'Correct' : type === 'flagged' ? 'Does not belong at this abstraction level' : 'Needs a fix');
+    node.appendChild(icon);
   }
 
   function checkDiagram() {
     attempts += 1;
     attemptsValue.textContent = attempts;
-    const expected = new Set(correctEdges.map(edgeKey));
-    const submitted = new Set(connections.map(edgeKey));
-    const missing = correctEdges.filter(e => !submitted.has(edgeKey(e)));
-    const extra = connections.filter(e => !expected.has(edgeKey(e)));
-
     clearStatusIcons();
+    reflection.hidden = true;
 
-    if (missing.length === 0 && extra.length === 0) {
+    const result = evaluate();
+
+    if (result.allCorrect) {
       modelStatus.textContent = 'Correct';
       feedback.className = 'feedback correct';
-      feedback.innerHTML = '<div class="feedback-head">Process logic is correct</div><p>Every action, decision, outcome, and merge is connected correctly. Your layout is accepted as-is.</p>';
-      document.querySelectorAll('.builder-node').forEach(n => n.classList.add('correct'));
+      feedback.innerHTML = '<div class="feedback-head">Process logic is correct</div><p>Every required execution reaches a valid end, both decisions have mutually exclusive guards, and no out-of-scope cards made it into the model.</p>';
+      document.querySelectorAll('.builder-node').forEach(n => { n.classList.add('correct'); addStatusIcon(n, 'correct', '\u2713'); });
+      reflection.hidden = false;
       playSuccessAnimation();
       return;
     }
 
     modelStatus.textContent = 'Needs revision';
-    feedback.className = 'feedback wrong';
 
     document.querySelectorAll('.builder-node').forEach(node => {
       const id = node.dataset.id;
-      const hasMissing = missing.some(e => e[0] === id || e[1] === id);
-      const hasExtra = extra.some(e => e[0] === id || e[1] === id);
-      if (hasExtra) node.classList.add('wrong');
+      const def = byId(id);
+      const hasExtra = result.extra.some(e => e.source === id || e.target === id);
+      const hasMissing = result.missing.some(e => e.source === id || e.target === id);
+      const hasMislabel = result.mislabeled.some(e => e.source === id || e.target === id);
+      const isAmbiguous = result.ambiguous.some(d => d.id === id);
+      if (def.isDistractor) {
+        node.classList.add('flagged'); addStatusIcon(node, 'flagged', '!');
+      } else if (hasExtra || hasMislabel || isAmbiguous) {
+        node.classList.add('wrong'); addStatusIcon(node, 'wrong', '\u2715');
+      } else if (!hasMissing) {
+        node.classList.add('correct'); addStatusIcon(node, 'correct', '\u2713');
+      }
     });
 
-    if (attempts === 1) {
-      feedback.innerHTML = `<div class="feedback-head">Revise the process logic</div><p>${missing.length} required connection${missing.length === 1 ? ' is' : 's are'} missing and ${extra.length} connection${extra.length === 1 ? ' is' : 's are'} unexpected. Try again, or use a hint if you're stuck.</p>`;
+    if (result.distractorsPresent.length) {
+      feedback.className = 'feedback flagged';
+      const d = result.distractorsPresent[0];
+      const more = result.distractorsPresent.length > 1 ? ` (${result.distractorsPresent.length - 1} more card${result.distractorsPresent.length > 2 ? 's' : ''} may also be out of scope.)` : '';
+      feedback.innerHTML = `<div class="feedback-head">Reconsider "${d.label}"</div><p>${d.reason}${more}</p>`;
+    } else if (result.ambiguous.length) {
+      feedback.className = 'feedback wrong';
+      const d = result.ambiguous[0];
+      feedback.innerHTML = `<div class="feedback-head">Guards aren't mutually exclusive</div><p>"${d.label}" has two outgoing branches that use the same guard. Each branch out of a decision needs to represent a distinct, non-overlapping condition.</p>`;
     } else {
-      const parts = [];
-      if (missing.length) {
-        const examples = missing.slice(0, 3).map(([s, t]) => `"${findNodeLabel(s)}" to "${findNodeLabel(t)}"`).join('; ');
-        parts.push(`${missing.length} required connection${missing.length === 1 ? ' is' : 's are'} missing, including ${examples}.`);
+      const firstFail = result.traceResults.find(t => !t.passes);
+      feedback.className = 'feedback wrong';
+      if (attempts === 1 || !firstFail) {
+        feedback.innerHTML = `<div class="feedback-head">Revise the process logic</div><p>Your current model does not provide a complete execution path for ${firstFail ? firstFail.name : 'every outcome described in the brief'}.</p>`;
+      } else {
+        const [s, t] = firstFail.brokenStep;
+        feedback.innerHTML = `<div class="feedback-head">Revise the process logic</div><p>Trace ${firstFail.name}. Does your model reach "${findNodeLabel(t)}" from "${findNodeLabel(s)}"? Check both the connection and its guard label.</p>`;
       }
-      if (extra.length) {
-        const examples = extra.slice(0, 3).map(([s, t]) => `"${findNodeLabel(s)}" to "${findNodeLabel(t)}"`).join('; ');
-        parts.push(`${extra.length} connection${extra.length === 1 ? ' is' : 's are'} incorrect, including ${examples}.`);
-      }
-      feedback.innerHTML = `<div class="feedback-head">Revise the process logic</div><p>${parts.join(' ')} Block placement is not scored.</p>`;
     }
   }
 
   function giveHint() {
-    const expected = new Set(correctEdges.map(edgeKey));
-    const submitted = new Set(connections.map(edgeKey));
-    const missing = correctEdges.filter(e => !submitted.has(edgeKey(e)));
-    const extra = connections.filter(e => !expected.has(edgeKey(e)));
-
+    const result = evaluate();
     hintsUsed += 1;
     hintsValue.textContent = hintsUsed;
     hintsUsedText.textContent = `${hintsUsed} hint${hintsUsed === 1 ? '' : 's'} used`;
-
     feedback.className = 'feedback';
-    if (extra.length) {
-      const [s, t] = extra[0];
-      feedback.innerHTML = `<div class="feedback-head">Hint</div><p>Double check the connection from "${findNodeLabel(s)}" to "${findNodeLabel(t)}" &mdash; it doesn't belong.</p>`;
-    } else if (missing.length) {
-      const [s] = missing[0];
-      feedback.innerHTML = `<div class="feedback-head">Hint</div><p>"${findNodeLabel(s)}" is missing at least one outgoing connection it needs.</p>`;
-    } else {
+
+    if (result.distractorsPresent.length) {
+      const d = result.distractorsPresent[0];
+      feedback.innerHTML = `<div class="feedback-head">Hint</div><p>Look again at "${d.label}" &mdash; is it something your model should represent, given the boundary and abstraction rule in the brief?</p>`;
+      return;
+    }
+    if (result.ambiguous.length) {
+      const d = result.ambiguous[0];
+      feedback.innerHTML = `<div class="feedback-head">Hint</div><p>"${d.label}" needs two branches whose guards can never both be true at once.</p>`;
+      return;
+    }
+
+    const firstFail = result.traceResults.find(t => !t.passes);
+    if (!firstFail) {
       feedback.innerHTML = `<div class="feedback-head">Hint</div><p>Your diagram looks complete &mdash; try checking it.</p>`;
+      return;
+    }
+    if (lastHintTrace !== firstFail.name) { lastHintTrace = firstFail.name; hintLevelForTrace = 1; }
+    else { hintLevelForTrace = Math.min(hintLevelForTrace + 1, 3); }
+
+    if (hintLevelForTrace === 1) {
+      feedback.innerHTML = `<div class="feedback-head">Hint</div><p>Your current model doesn't provide a complete execution path for ${firstFail.name}.</p>`;
+    } else if (hintLevelForTrace === 2) {
+      const [s, t] = firstFail.brokenStep;
+      feedback.innerHTML = `<div class="feedback-head">Hint</div><p>Trace that case step by step. Can it get from "${findNodeLabel(s)}" to "${findNodeLabel(t)}" and on to the final node?</p>`;
+    } else {
+      const [s, t] = firstFail.brokenStep;
+      const expected = correctByKey.get(structKey(s, t));
+      const guardHint = expected && expected.label ? ` labeled [${expected.label}]` : '';
+      feedback.innerHTML = `<div class="feedback-head">Hint</div><p>You need a connection from "${findNodeLabel(s)}" to "${findNodeLabel(t)}"${guardHint}.</p>`;
     }
   }
 
   function playSuccessAnimation() {
     const adjacency = {};
-    connections.forEach(([s, t]) => { (adjacency[s] = adjacency[s] || []).push(t); });
+    connections.forEach(c => { (adjacency[c.source] = adjacency[c.source] || []).push(c.target); });
     const order = [];
     const visited = new Set();
     const queue = ['start'];
@@ -676,24 +1080,32 @@
 
   function resetAll() {
     connections = [];
+    onCanvas = new Set();
     attempts = 0;
     hintsUsed = 0;
+    lastHintTrace = null;
+    hintLevelForTrace = 0;
     showAnswer = false;
     answerLines.innerHTML = '';
+    nodeLayer.innerHTML = '';
+    document.querySelectorAll('.guard-picker').forEach(p => p.remove());
     attemptsValue.textContent = '0';
     hintsValue.textContent = '0';
     hintsUsedText.textContent = '0 hints used';
     document.getElementById('answerButton').textContent = 'Instructor answer';
+    reflection.hidden = true;
     clearStatusIcons();
-    createNodes();
+    poolOrder = shuffledIndices(definitions.length).map(i => definitions[i].id);
+    renderPool();
     updateBadge();
     modelStatus.textContent = 'Incomplete';
     feedback.className = 'feedback';
-    feedback.innerHTML = '<div class="feedback-head">Your task</div><p>Connect the blocks so every possible penalty-kick outcome follows the correct causal path.</p>';
+    feedback.innerHTML = '<div class="feedback-head">Your task</div><p>Add the cards you think belong, connect them, and choose a guard label at each decision. Every possible outcome should reach a valid end.</p>';
   }
 
   document.getElementById('checkButton').addEventListener('click', checkDiagram);
   document.getElementById('hintButton').addEventListener('click', giveHint);
+  document.getElementById('tidyButton').addEventListener('click', tidyLayout);
   document.getElementById('resetButton').addEventListener('click', resetAll);
 
   document.getElementById('answerButton').addEventListener('click', () => {
@@ -714,6 +1126,7 @@
       return;
     }
     passwordDialog.close();
+    definitions.filter(d => !d.isDistractor && !onCanvas.has(d.id)).forEach(d => addNodeToCanvas(d.id));
     showAnswer = true;
     document.getElementById('answerButton').textContent = 'Hide answer';
     drawConnections();
@@ -722,9 +1135,8 @@
     if (e.key === 'Enter') document.getElementById('submitPasswordButton').click();
   });
 
-  window.addEventListener('resize', () => drawConnections());
+  window.addEventListener('resize', () => { if (nodesInitialized) drawConnections(); });
 
-  createNodes();
   updateBadge();
 </script>
 </body>
