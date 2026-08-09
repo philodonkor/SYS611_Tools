@@ -326,30 +326,208 @@
     <h1>The penalty kick</h1>
     <p class="brief-lede">A soccer game is tied, and a penalty kick will decide the winner. The ball is placed on the penalty spot, the goalkeeper set on the line. The referee checks that both are ready, then signals the kicker to proceed. From here, the attempt may drift off target, be stopped by the goalkeeper, or result in a goal.</p>
 
-    <svg class="brief-illustration" viewBox="0 0 640 260" role="img" aria-label="A kicker striking a penalty toward a goalkeeper set on the line.">
-      <g fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
-        <g style="stroke:var(--cyan-bright)" stroke-width="1.6">
-          <path d="M20 226H620" opacity="0.4"/>
-          <circle cx="230" cy="226" r="2.5" style="fill:var(--cyan-bright)" stroke="none"/>
-          <path d="M198 226a34 34 0 0 1 30-30" stroke-dasharray="1,5" opacity="0.5"/>
-          <path d="M430 60V226M430 60H610M610 60V226"/>
-          <g stroke-width="0.7" opacity="0.35">
-            <path d="M430 80H610M430 100H610M430 120H610M430 140H610M430 160H610M430 180H610M430 200H610"/>
-            <path d="M450 60V226M470 60V226M490 60V226M510 60V226M530 60V226M550 60V226M570 60V226M590 60V226"/>
-          </g>
-          <circle cx="520" cy="150" r="11"/>
-          <path d="M520 161V196"/>
-          <path d="M520 168 L494 148M520 168 L546 148"/>
-          <path d="M520 196 L500 222M520 196 L540 222"/>
-          <circle cx="150" cy="176" r="11"/>
-          <path d="M150 187 L172 210"/>
-          <path d="M158 194 L138 176M158 194 L182 202"/>
-          <path d="M172 210 L192 226M172 210 L158 232"/>
-          <circle cx="230" cy="222" r="8"/>
-          <path d="M230 214 224 219 226 226 234 226 236 219Z" stroke-width="1"/>
-        </g>
+<svg
+  class="brief-illustration"
+  viewBox="0 0 640 260"
+  role="img"
+  aria-label="A soccer player taking a penalty kick toward a goalkeeper positioned in front of the goal."
+>
+  <g
+    fill="none"
+    stroke="var(--cyan-bright)"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+
+    <!-- ============================================================
+         FIELD
+         ============================================================ -->
+    <g opacity="0.42" stroke-width="1.2">
+      <path d="M22 226H618"/>
+      <circle
+        cx="232"
+        cy="225"
+        r="3"
+        fill="var(--cyan-bright)"
+        stroke="none"
+      />
+
+      <!-- hint of penalty arc -->
+      <path
+        d="M196 226
+           C198 207 211 194 229 191"
+        stroke-dasharray="2 6"
+      />
+    </g>
+
+
+    <!-- ============================================================
+         GOAL — slight perspective adds depth
+         ============================================================ -->
+    <g>
+      <!-- front frame -->
+      <path
+        d="M438 67V226
+           M438 67H598
+           M598 67V226"
+        stroke-width="2.2"
+      />
+
+      <!-- rear frame -->
+      <path
+        d="M452 78H614
+           M614 78V226"
+        stroke-width="1"
+        opacity="0.45"
+      />
+
+      <!-- depth -->
+      <path d="M438 67L452 78"/>
+      <path d="M598 67L614 78"/>
+      <path d="M598 226H614"/>
+
+      <!-- net -->
+      <g stroke-width="0.65" opacity="0.3">
+        <path d="M440 91L612 99"/>
+        <path d="M440 114L612 119"/>
+        <path d="M440 137L612 139"/>
+        <path d="M440 160L612 159"/>
+        <path d="M440 183L612 179"/>
+        <path d="M440 206L612 199"/>
+
+        <path d="M460 71L472 226"/>
+        <path d="M482 70L492 226"/>
+        <path d="M504 69L512 226"/>
+        <path d="M526 69L532 226"/>
+        <path d="M548 68L552 226"/>
+        <path d="M570 68L572 226"/>
       </g>
-    </svg>
+    </g>
+
+
+    <!-- ============================================================
+         GOALKEEPER
+         ============================================================ -->
+    <g stroke-width="1.8">
+      <!-- head -->
+      <circle cx="520" cy="143" r="10"/>
+
+      <!-- shoulders / torso -->
+      <path
+        d="M509 158
+           Q520 153 531 158
+           L527 191
+           Q520 196 513 191
+           Z"
+      />
+
+      <!-- arms -->
+      <path d="M510 162L486 148L474 154"/>
+      <path d="M530 162L554 148L566 154"/>
+
+      <!-- hands -->
+      <circle cx="472" cy="155" r="3.2"/>
+      <circle cx="568" cy="155" r="3.2"/>
+
+      <!-- legs -->
+      <path d="M516 192L497 221"/>
+      <path d="M524 192L544 221"/>
+
+      <!-- feet -->
+      <path d="M497 221H488"/>
+      <path d="M544 221H553"/>
+    </g>
+
+
+    <!-- ============================================================
+         KICKER
+         ============================================================ -->
+    <g stroke-width="1.8">
+      <!-- head -->
+      <circle cx="144" cy="168" r="10"/>
+
+      <!-- leaning torso -->
+      <path
+        d="M149 180
+           L168 205
+           L181 197
+           L160 175
+           Z"
+      />
+
+      <!-- arms -->
+      <path d="M157 184L137 176L126 185"/>
+      <path d="M166 190L185 181"/>
+
+      <!-- planted leg -->
+      <path d="M171 204L189 224"/>
+      <path d="M189 224L200 224"/>
+
+      <!-- striking leg -->
+      <path
+        d="M172 205
+           Q185 205 199 214
+           Q210 220 220 220"
+      />
+
+      <!-- subtle motion lines -->
+      <g opacity="0.42" stroke-width="1.1">
+        <path d="M116 181L101 187"/>
+        <path d="M120 193L104 202"/>
+      </g>
+    </g>
+
+
+    <!-- ============================================================
+         BALL
+         ============================================================ -->
+    <g>
+      <circle
+        cx="233"
+        cy="219"
+        r="8.5"
+        fill="var(--navy)"
+        stroke-width="1.6"
+      />
+
+      <!-- simplified ball pattern -->
+      <path
+        d="M233 212
+           L228 216
+           L230 222
+           L236 222
+           L238 216
+           Z"
+        stroke-width="0.9"
+      />
+
+      <path d="M228 216L225 214"/>
+      <path d="M238 216L241 214"/>
+      <path d="M230 222L227 226"/>
+      <path d="M236 222L239 226"/>
+    </g>
+
+
+    <!-- ============================================================
+         IMPLIED BALL TRAJECTORY
+         ============================================================ -->
+    <path
+      d="M247 214
+         C310 197 363 178 425 163"
+      stroke-width="1.2"
+      stroke-dasharray="2 8"
+      opacity="0.38"
+    />
+
+    <!-- small directional cue -->
+    <path
+      d="M418 158L428 162L420 169"
+      stroke-width="1.2"
+      opacity="0.5"
+    />
+
+  </g>
+</svg>
 
     <div class="brief-col">
       <div>
