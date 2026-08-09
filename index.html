@@ -230,7 +230,6 @@
     </div>
     <svg class="hero-motif" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
       <g fill="none" stroke-linecap="round" stroke-linejoin="round">
-        <!-- source cloud -->
         <g style="stroke:var(--cyan-bright)" stroke-width="1.1" opacity="0.6">
           <circle cx="70" cy="190" r="14"/>
           <circle cx="90" cy="178" r="18"/>
@@ -245,12 +244,10 @@
           <path d="M332 178 352 190 332 202ZM372 178 352 190 372 202Z"/>
           <path d="M372 190H398"/>
         </g>
-        <!-- sink cloud -->
         <g style="stroke:var(--cyan-bright)" stroke-width="1.1" opacity="0.6">
           <circle cx="400" cy="190" r="14"/>
           <circle cx="382" cy="178" r="10"/>
         </g>
-        <!-- feedback loop -->
         <path d="M261 220C261 310 130 300 100 200" style="stroke:var(--cyan-bright)" stroke-width="1" stroke-dasharray="1,5" opacity="0.55"/>
         <g style="stroke:var(--cyan-bright)" stroke-width="1" opacity="0.6">
           <circle cx="100" cy="200" r="7"/>
@@ -275,18 +272,13 @@
   </footer>
 
 <script>
-  // ---------------------------------------------------------------- icons
   const ICONS = {
     diagram: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><path d="M10 6.5h4a2 2 0 0 1 2 2V14"/></svg>',
     curve: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 19c3-.5 4-9 6-9s3 6 5 6 3-7 7-7"/></svg>',
     default: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8.5"/><path d="M12 8v4l3 2"/></svg>',
   };
 
-  // ---------------------------------------------------------------- motifs (content-accurate unit watermarks)
-  // Each motif depicts something real from that unit's subject matter, not generic
-  // decoration, and shares one stroke weight / accent-fill convention across the set.
   const MOTIFS = {
-    // Unit 1 — Foundations: an activity diagram (start -> process -> process -> decision -> parallel branches -> end)
     flow: `<svg class="unit-motif" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
       <g fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.6">
         <g style="stroke:var(--cyan)" stroke-width="1.4">
@@ -306,7 +298,6 @@
         <path d="M384 66 392 93M384 134 392 107" style="stroke:var(--ink-faint)" stroke-width="1" stroke-dasharray="1,4"/>
       </g>
     </svg>`,
-    // Unit 2 — Probability: a density curve on labeled axes with the mean marked
     curve: `<svg class="unit-motif" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
       <g fill="none" stroke-linecap="round" opacity="0.6">
         <path d="M40 160H372M40 160V32" style="stroke:var(--ink-faint)" stroke-width="1" opacity="0.6"/>
@@ -316,7 +307,6 @@
         <circle cx="202" cy="48" r="4" style="fill:var(--cyan)" stroke="none"/>
       </g>
     </svg>`,
-    // Unit 3 — Dynamic Systems: a birth–death Markov / queuing chain (states with arrival & departure transitions)
     network: `<svg class="unit-motif" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
       <g fill="none" stroke-linecap="round" opacity="0.6">
         <g style="stroke:var(--ink-faint)" stroke-width="1.2">
@@ -337,7 +327,6 @@
         <circle cx="70" cy="100" r="5" style="fill:var(--cyan)" stroke="none"/>
       </g>
     </svg>`,
-    // Unit 4 — Capstone: agent-based simulation (lattice grid, oriented agents, interaction lines)
     agents: `<svg class="unit-motif" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
       <g opacity="0.6">
         <g style="stroke:var(--line-strong)" stroke-width="1" fill="none" opacity="0.8">
@@ -360,11 +349,6 @@
     </svg>`,
   };
 
-  // ---------------------------------------------------------------- data
-  // Dates are real ISO strings now, so "next lecture" / "course complete" logic
-  // and <time datetime> both work without re-parsing display strings.
-  // Add a new tool to any week by adding an entry to its `tools` array:
-  // { name: "Tool Name", type: "Category Label", icon: "diagram" | "curve" | "default", href: "file.html" }
   const units = [
     {
       id: "foundations", num: "Unit 01", nav: "Foundations", title: "Foundations & Modeling Tools", motif: "flow",
@@ -409,7 +393,6 @@
     },
   ];
 
-  // ---------------------------------------------------------------- date helpers
   const DISPLAY_FMT = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' });
 
   function toDate(iso){ return new Date(iso + 'T00:00:00'); }
@@ -421,7 +404,7 @@
   function startOfWeek(date) {
     const d = new Date(date);
     const day = d.getDay();
-    const diff = day === 0 ? -6 : 1 - day; // Monday start
+    const diff = day === 0 ? -6 : 1 - day;
     d.setDate(d.getDate() + diff);
     d.setHours(0, 0, 0, 0);
     return d;
@@ -431,7 +414,6 @@
   const thisWeekEnd = new Date(thisWeekStart);
   thisWeekEnd.setDate(thisWeekEnd.getDate() + 7);
 
-  // flatten all lecture dates to find "this week" / "next lecture" / "course complete"
   const allLectures = [];
   units.forEach(unit => unit.weeks.forEach(w => allLectures.push({ unitId: unit.id, ...w, dateObj: toDate(w.date) })));
   allLectures.sort((a, b) => a.dateObj - b.dateObj);
@@ -451,7 +433,6 @@
     }
   }
 
-  // ---------------------------------------------------------------- status strip
   const statusShell = document.getElementById('status-shell');
   if (currentWeekKey) {
     // handled inline via .is-now on the week row itself; no separate strip needed
@@ -470,7 +451,6 @@
       </div>`;
   }
 
-  // ---------------------------------------------------------------- render
   const nav = document.getElementById('unitnav');
   const main = document.getElementById('main');
 
@@ -489,7 +469,7 @@
         : '';
       const toolsHtml = w.tools.length
         ? `<div class="tools">${w.tools.map(t => `
-            <a class="tool-chip" href="${t.href}">
+            <a class="tool-chip" href="${t.href}" target="_blank" rel="noopener noreferrer">
               ${ICONS[t.icon] || ICONS.default}
               <span class="tt"><b>${t.name}</b><span>${t.type}</span></span>
             </a>`).join('')}</div>`
@@ -528,10 +508,6 @@
     main.appendChild(section);
   });
 
-  // ---------------------------------------------------------------- scrollspy
-  // Nav aria-current reflects scroll position (where you are on the page),
-  // which is a separate concept from the calendar-based "this week" highlight
-  // on the week rows themselves (where you are in the semester).
   const navLinks = Array.from(nav.querySelectorAll('a[data-unit]'));
   const sections = units.map(u => document.getElementById(u.id));
 
@@ -544,7 +520,6 @@
 
   if ('IntersectionObserver' in window) {
     const observer = new IntersectionObserver((entries) => {
-      // pick the entry closest to the top of the viewport among those intersecting
       const visible = entries.filter(e => e.isIntersecting);
       if (visible.length) {
         visible.sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
@@ -554,7 +529,6 @@
 
     sections.forEach(s => observer.observe(s));
   } else {
-    // fallback: highlight the unit containing the current calendar week, if any
     if (currentWeekKey) {
       const owningUnit = units.find(u => u.weeks.some(w => (u.id + w.wk) === currentWeekKey));
       if (owningUnit) setActiveNav(owningUnit.id);
