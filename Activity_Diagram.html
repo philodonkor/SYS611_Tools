@@ -115,53 +115,65 @@
   /* ================================================================
      TOOL SCREEN
      ================================================================ */
-  .app{ max-width:1440px; margin:0 auto; padding:0 0 32px; }
+  .app{ height:100vh; display:flex; flex-direction:column; overflow:hidden; }
+
+  /* ---- Header: back link, title, status pill ---- */
   .topbar{
-    background:var(--navy); border-bottom:2px solid var(--cyan-bright); padding:15px 24px;
-    display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap;
+    background:var(--navy); border-bottom:2px solid var(--cyan-bright); padding:12px 20px;
+    display:flex; align-items:center; gap:16px; flex-wrap:wrap; flex-shrink:0;
   }
-  .eyebrow{ font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.08em; color:var(--cyan-bright); text-transform:uppercase; margin-bottom:4px; }
-  .topbar h1{ font-family:'Inter',sans-serif; font-weight:700; font-size:16.5px; color:#FFFFFF; letter-spacing:-0.005em; }
-  .subtitle{ margin-top:4px; color:var(--cyan-soft); font-size:12.5px; max-width:600px; line-height:1.5; }
-  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-  .badge{
-    display:inline-flex; align-items:center; gap:6px; padding:6px 11px; border-radius:999px;
-    background:var(--cyan-faint); color:#0E5C79; font-size:11.5px; font-weight:700; font-family:'IBM Plex Mono',monospace;
+  .back-link{
+    background:none; border:none; color:var(--cyan-soft); font-size:12.5px; font-weight:600;
+    padding:4px 2px; display:flex; align-items:center; gap:4px;
+  }
+  .back-link:hover{ color:#fff; }
+  .topbar h1{ font-family:'Inter',sans-serif; font-weight:700; font-size:15.5px; color:#FFFFFF; letter-spacing:-0.005em; }
+  .status-pill{
+    display:inline-flex; align-items:center; gap:6px; padding:5px 11px; border-radius:999px;
+    background:#161B22; color:var(--cyan-soft); font-size:11.5px; font-weight:600; font-family:'IBM Plex Mono',monospace;
+    margin-left:auto;
+  }
+  .status-pill .dot{ width:7px; height:7px; border-radius:50%; background:var(--cyan-bright); flex-shrink:0; }
+  .status-pill.correct{ background:var(--success-bg); color:var(--success); }
+  .status-pill.correct .dot{ background:var(--success); }
+
+  .legend-toggle{
+    background:none; border:1.5px solid #333944; color:var(--cyan-soft); border-radius:999px;
+    font-size:11.5px; font-weight:600; padding:5px 12px;
+  }
+  .legend-toggle:hover{ border-color:var(--cyan-bright); }
+  .legend-popover{
+    position:absolute; z-index:20; margin-top:8px; background:var(--card); border:1px solid var(--line);
+    border-radius:12px; padding:14px 16px; box-shadow:0 10px 30px rgba(10,10,13,0.16); min-width:190px;
+  }
+  .legend-popover .legend-row{display:flex;gap:9px;align-items:center;font-size:12.5px}
+  .legend-popover .legend-row + .legend-row{margin-top:8px}
+  .header-wrap{ position:relative; }
+
+  /* ---- Candidate card tray ---- */
+  .tray{ background:var(--card); border-bottom:1px solid var(--line); padding:12px 20px; flex-shrink:0; }
+  .tray-head{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:9px; }
+  .tray-head h3{ font-family:'Inter',sans-serif; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--ink-muted); }
+  .tray-count{ font-size:11.5px; color:var(--ink-faint); font-family:'IBM Plex Mono',monospace; }
+  .tray-row{ display:flex; gap:8px; overflow-x:auto; padding-bottom:2px; scrollbar-width:thin; }
+  .tray-empty{ font-size:12.5px; color:var(--ink-faint); font-style:italic; padding:6px 0; }
+
+  .tray-card{
+    flex:0 0 auto; display:flex; align-items:center; gap:7px; white-space:nowrap;
+    background:var(--paper); border:1.5px solid var(--line-strong); border-radius:999px;
+    padding:8px 14px 8px 11px; font-size:12.5px; font-weight:500; color:var(--ink);
+    transition:border-color .12s ease, transform .12s ease, background .12s ease;
+  }
+  .tray-card:hover{ border-color:var(--cyan); background:var(--cyan-faint); transform:translateY(-1px); }
+  .tray-card .plus{
+    display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px;
+    border-radius:50%; background:var(--ink); color:#fff; font-size:11px; font-weight:700; flex-shrink:0;
   }
 
-  .content{ padding:18px 24px 0; background:var(--paper); }
-  .layout{ display:grid; grid-template-columns:264px 1fr; gap:16px; align-items:start; }
-
-  .card{ background:var(--card); border:1px solid var(--line); border-radius:12px; padding:13px; }
-  .sidebar{display:flex;flex-direction:column;gap:13px}
-  .sidebar h3{ font-family:'Inter',sans-serif; font-size:13.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.01em; }
-
-  .legend{display:grid;gap:8px;font-size:12.5px;margin-top:8px}
-  .legend-row{display:flex;gap:9px;align-items:center}
-  .symbol{ flex-shrink:0; border:1.5px solid var(--ink); }
-  .symbol.action{width:24px;height:15px;border-radius:4px}
-  .symbol.initial{width:12px;height:12px;border-radius:50%;background:var(--ink);border:none}
-  .symbol.decision{width:13px;height:13px;background:var(--ink);clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%);border:none}
-  .symbol.final{width:13px;height:13px;border-radius:50%;position:relative}
-  .symbol.final::after{content:"";position:absolute;inset:2.5px;border-radius:50%;background:var(--ink)}
-
-  .section-rule{border-top:1px solid var(--line);padding-top:11px}
-  .stack{display:grid;gap:7px}
-  .help{font-size:11.5px;color:var(--ink-muted);line-height:1.5}
-
-  .pool-card{
-    display:block; width:100%; text-align:left; background:var(--paper); border:1.5px solid var(--line-strong);
-    border-radius:8px; padding:9px 11px; font-size:12px; font-weight:500; color:var(--ink); line-height:1.3;
-    transition:border-color .12s ease, transform .12s ease;
-  }
-  .pool-card:hover{ border-color:var(--cyan); transform:translateY(-1px); }
-  .pool-list{ display:grid; gap:7px; }
-  .pool-empty{ font-size:11.5px; color:var(--ink-faint); font-style:italic; }
-
-  .workspace-wrap{display:grid;gap:8px}
-  .workspace-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+  /* ---- Canvas: takes remaining height ---- */
+  .canvas-wrap{ flex:1; position:relative; min-height:0; background:var(--paper); }
   #workspace{
-    position:relative; min-height:560px; overflow:hidden; border:1px solid var(--line); border-radius:12px;
+    position:absolute; inset:12px 20px; overflow:hidden; border:1px solid var(--line); border-radius:12px;
     background:var(--card); background-image:radial-gradient(var(--line) 1px, transparent 1px);
     background-size:28px 28px; touch-action:none;
   }
@@ -217,10 +229,13 @@
   .status-icon.wrong{background:var(--danger)}
   .status-icon.flagged{background:var(--warning)}
 
+  /* Top/bottom connectors are discoverable by default; left/right reveal on hover */
   .handle{
     position:absolute; width:9px; height:9px; border-radius:50%; background:var(--cyan);
-    border:1.5px solid #fff; opacity:.28; cursor:crosshair; z-index:4; transition:opacity .12s ease, transform .12s ease;
+    border:1.5px solid #fff; cursor:crosshair; z-index:4; transition:opacity .12s ease, transform .12s ease;
   }
+  .handle.top,.handle.bottom{ opacity:.5; }
+  .handle.left,.handle.right{ opacity:0; }
   .builder-node:hover .handle{ opacity:.85; }
   .handle:hover{ transform:scale(1.5); opacity:1; }
   .handle.top{top:-5px;left:calc(50% - 4.5px)}
@@ -248,58 +263,58 @@
   .guard-picker button:hover{ border-color:var(--cyan); background:var(--cyan-faint); }
   .guard-picker .gp-cancel{ color:var(--ink-faint); font-weight:500; border:none; background:none; text-align:center; padding:4px; }
 
-  .hint-text{ font-size:12.5px; color:var(--ink-muted); }
-
+  /* ---- Inline feedback, sits right above the action bar ---- */
+  .feedback-wrap{ padding:0 20px; flex-shrink:0; }
   .feedback{
-    margin-top:12px; padding:11px 14px; border-radius:10px; background:var(--card);
+    margin-top:10px; padding:10px 14px; border-radius:10px; background:var(--card);
     border:1px solid var(--line); border-left:3px solid var(--cyan); font-size:13px;
   }
   .feedback.correct{ border-left-color:var(--success); background:var(--success-bg); }
   .feedback.wrong{ border-left-color:var(--danger); background:var(--danger-bg); }
   .feedback.flagged{ border-left-color:var(--warning); background:var(--warning-bg); }
   .feedback p+p{margin-top:5px;color:var(--ink-muted);font-size:12.5px;line-height:1.5}
-  .feedback-head{ display:flex; align-items:center; gap:8px; font-weight:700; font-size:13px; }
-
-  .metrics{
-    margin:12px 0 20px; padding:10px 14px; display:flex; gap:22px; flex-wrap:wrap;
-    background:var(--card); border:1px solid var(--line); border-radius:10px;
-  }
-  .metric{ display:flex; align-items:baseline; gap:6px; }
-  .metric-label{ font-size:11px; color:var(--ink-muted); font-family:'IBM Plex Mono',monospace; text-transform:uppercase; }
-  .metric-value{ font-size:15px; font-weight:700; font-family:'Inter',sans-serif; }
-
-  .reflection{
-    margin-top:16px; padding:16px 18px; border-radius:12px; background:var(--navy); color:#E7ECF1;
-  }
-  .reflection .callout-label{
-    font-family:'IBM Plex Mono',monospace; font-size:var(--fs-micro); letter-spacing:0.08em;
-    text-transform:uppercase; color:var(--cyan-bright); margin-bottom:8px;
-  }
-  .reflection p{ font-size:var(--fs-sm); line-height:1.6; color:var(--cyan-soft); }
-  .reflection p + p{ margin-top:10px; }
-  .reflection .not-graded{
-    display:inline-block; margin-top:12px; font-family:'IBM Plex Mono',monospace; font-size:var(--fs-micro);
-    color:var(--ink-faint); letter-spacing:0.02em;
+  .feedback-head{ display:flex; align-items:center; justify-content:space-between; gap:8px; font-weight:700; font-size:13px; }
+  .hint-link{
+    background:none; border:none; color:var(--cyan); font-weight:600; font-size:12px;
+    text-decoration:underline; text-underline-offset:2px; padding:0;
   }
 
-  dialog{ border:1px solid var(--line); border-radius:16px; padding:0; background:var(--card); color:var(--ink); }
-  dialog::backdrop{background:rgba(10,10,13,.55)}
-  .dialog-body{width:min(92vw,400px);padding:22px;display:grid;gap:16px}
-  label{display:grid;gap:6px;font-weight:600;font-size:13.5px}
-  input[type="password"]{
-    width:100%; border:1.5px solid var(--line); border-radius:9px; padding:10px 12px; background:var(--paper); color:var(--ink);
+  /* ---- Success panel replaces the feedback block on correct ---- */
+  .success-panel{
+    margin-top:10px; padding:14px 16px; border-radius:10px; background:var(--success-bg);
+    border:1px solid var(--success); display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap;
   }
-  input[type="password"]:focus{ outline:2px solid var(--cyan); outline-offset:1px; border-color:var(--cyan); }
-  .error{color:var(--danger);font-size:13px;min-height:1.2em}
-  .dialog-actions{display:flex;justify-content:flex-end;gap:8px}
+  .success-panel .headline{ font-weight:700; font-size:14px; color:var(--success); }
+  .success-panel p{ font-size:12.5px; color:var(--ink-muted); margin-top:2px; }
+  .success-panel .actions{ display:flex; align-items:center; gap:14px; flex-shrink:0; }
+  .reflect-link{ background:none; border:none; color:var(--cyan); font-weight:600; font-size:12.5px; }
+  .reflect-note{
+    margin-top:8px; font-size:12.5px; color:var(--ink-muted); line-height:1.5; max-width:60ch;
+  }
+  .reflect-note .not-graded{ display:block; margin-top:4px; color:var(--ink-faint); font-size:11.5px; font-family:'IBM Plex Mono',monospace; }
+
+  /* ---- Bottom action bar ---- */
+  .action-bar{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    padding:12px 20px; background:var(--card); border-top:1px solid var(--line); flex-shrink:0;
+  }
+  .action-bar .row{ display:flex; gap:8px; }
+  .btn.check{
+    padding:12px 26px; font-size:14px; border-radius:10px;
+    background:var(--ink); color:#fff; border-color:var(--ink);
+  }
+  .btn.check:hover{ background:#000; border-color:#000; }
+
+  /* ---- Confetti ---- */
+  #confettiLayer{ position:fixed; inset:0; pointer-events:none; z-index:50; overflow:hidden; }
+  .confetti-piece{ position:absolute; top:-12px; border-radius:2px; opacity:0; }
 
   @media(max-width:900px){
-    .layout{grid-template-columns:1fr}
-    #workspace{min-height:600px}
+    #workspace{ inset:10px 12px; }
   }
   @media(max-width:640px){
-    .topbar,.content{padding-left:16px;padding-right:16px}
-    .metrics{flex-direction:column;gap:8px}
+    .topbar,.tray,.canvas-wrap,.feedback-wrap,.action-bar{padding-left:14px;padding-right:14px}
+    .tray-row{padding-bottom:4px}
   }
 </style>
 </head>
@@ -307,7 +322,7 @@
 
 <section id="briefScreen" class="brief">
   <div class="brief-inner shell">
-    <p class="brief-masthead">Stevens &middot; SYS 611 &middot; Fall 2026 &middot; </p>
+    <p class="brief-masthead">Stevens Institute of Technology &middot; SYS 611 &middot; Fall 2026 &middot; Diagram Builder</p>
 
     <h1>The penalty kick</h1>
 
@@ -546,117 +561,81 @@
 
 <div id="toolScreen" class="app" hidden>
 
-  <div class="topbar">
-    <div>
-      <div class="eyebrow">SYS 611 &middot; Diagram Builder</div>
-      <h1>Model the penalty-kick process</h1>
-      <p class="subtitle">Add cards to the workspace, then drag between edge dots to connect them. Leaving a card in the pool can be the right call.</p>
+  <div class="topbar header-wrap">
+    <button id="briefButton" class="back-link" type="button">&larr; Brief</button>
+    <h1>Model the penalty-kick process</h1>
+    <button id="legendToggle" class="legend-toggle" type="button" aria-expanded="false">? Diagram symbols</button>
+    <div id="legendPopover" class="legend-popover" hidden>
+      <div class="legend-row"><span class="symbol initial"></span><span>Initial node</span></div>
+      <div class="legend-row"><span class="symbol action"></span><span>Action</span></div>
+      <div class="legend-row"><span class="symbol decision"></span><span>Decision</span></div>
+      <div class="legend-row"><span class="symbol final"></span><span>Activity final</span></div>
     </div>
-    <div class="row">
-      <span class="badge" id="connBadge">0 connections</span>
-      <button id="briefButton" class="btn ghost" type="button">Scenario brief</button>
-      <button id="answerButton" class="btn ghost" type="button">Instructor answer</button>
+    <span class="status-pill" id="statusPill"><span class="dot"></span><span id="statusPillText">In progress</span></span>
+  </div>
+
+  <div class="tray">
+    <div class="tray-head">
+      <h3>Candidate cards</h3>
+      <span class="tray-count" id="trayCount"></span>
+    </div>
+    <div class="tray-row" id="poolList"></div>
+  </div>
+
+  <div class="canvas-wrap">
+    <div id="workspace" aria-label="Activity diagram construction canvas">
+      <svg id="connectionLayer" aria-hidden="true">
+        <defs>
+          <marker id="builderArrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L0,6 L9,3 z" fill="var(--ink)"></path>
+          </marker>
+          <marker id="answerArrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L0,6 L9,3 z" fill="var(--success)"></path>
+          </marker>
+          <marker id="dragArrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L0,6 L9,3 z" fill="var(--cyan)"></path>
+          </marker>
+        </defs>
+        <g id="answerLines"></g>
+        <g id="connectionLines"></g>
+        <g id="dragLineLayer"></g>
+      </svg>
+      <div id="nodeLayer"></div>
     </div>
   </div>
 
-  <div class="content">
-    <section class="layout">
-      <aside class="card sidebar">
-        <div>
-          <h3>Legend</h3>
-          <div class="legend">
-            <div class="legend-row"><span class="symbol initial"></span><span>Initial node</span></div>
-            <div class="legend-row"><span class="symbol action"></span><span>Action</span></div>
-            <div class="legend-row"><span class="symbol decision"></span><span>Decision</span></div>
-            <div class="legend-row"><span class="symbol final"></span><span>Activity final</span></div>
-          </div>
-        </div>
-
-        <div class="section-rule">
-          <p class="help">Click a card to add it. Drag between edge dots to connect blocks &mdash; decisions prompt for a guard. Click a connection or × to remove it.</p>
-        </div>
-
-        <div class="section-rule">
-          <h3>Candidate cards</h3>
-          <div class="pool-list" id="poolList"></div>
-        </div>
-
-        <div class="section-rule stack">
-          <button id="hintButton" class="btn full" type="button">Get a hint</button>
-          <button id="tidyButton" class="btn full" type="button">Tidy layout</button>
-          <button id="resetButton" class="btn full" type="button">Reset workspace</button>
-        </div>
-
-        <button id="checkButton" class="btn primary full" type="button">Check process logic</button>
-      </aside>
-
-      <div class="workspace-wrap">
-        <div class="workspace-head">
-          <h3 style="font-family:'Inter',sans-serif;font-size:14px;font-weight:700;">Student workspace</h3>
-          <span class="hint-text" id="hintsUsedText">0 hints used</span>
-        </div>
-
-        <div id="workspace" aria-label="Activity diagram construction canvas">
-          <svg id="connectionLayer" aria-hidden="true">
-            <defs>
-              <marker id="builderArrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
-                <path d="M0,0 L0,6 L9,3 z" fill="var(--ink)"></path>
-              </marker>
-              <marker id="answerArrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
-                <path d="M0,0 L0,6 L9,3 z" fill="var(--success)"></path>
-              </marker>
-              <marker id="dragArrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
-                <path d="M0,0 L0,6 L9,3 z" fill="var(--cyan)"></path>
-              </marker>
-            </defs>
-            <g id="answerLines"></g>
-            <g id="connectionLines"></g>
-            <g id="dragLineLayer"></g>
-          </svg>
-          <div id="nodeLayer"></div>
-        </div>
-      </div>
-    </section>
-
+  <div class="feedback-wrap">
     <div id="feedback" class="feedback" aria-live="polite">
       <div class="feedback-head"><span>Your task</span></div>
       <p>Add the cards you think belong, connect them, and choose a guard label at each decision. Every possible outcome should reach a valid end.</p>
     </div>
-
-    <div id="reflection" class="reflection" hidden>
-      <p class="callout-label">Looking ahead</p>
-      <p>What information about the real penalty kick did you deliberately leave out of this model? </p>
+    <div id="successPanel" class="success-panel" hidden>
+      <div>
+        <div class="headline">You got it.</div>
+        <p>All three outcomes are represented and the process logic is valid.</p>
+      </div>
+      <div class="actions">
+        <button id="reflectLink" class="reflect-link" type="button">Reflect on your modeling choices</button>
+      </div>
     </div>
-
-    <div class="metrics">
-      <div class="metric"><div class="metric-label">Attempts</div><div class="metric-value" id="attemptsValue">0</div></div>
-      <div class="metric"><div class="metric-label">Hints used</div><div class="metric-value" id="hintsValue">0</div></div>
-      <div class="metric"><div class="metric-label">Model status</div><div class="metric-value" id="modelStatus">Incomplete</div></div>
-    </div>
+    <p id="reflectNote" class="reflect-note" hidden>
+      What information about the real penalty kick did you deliberately leave out of this model?
+      <span class="not-graded">This activity is not graded.</span>
+    </p>
   </div>
 
-  <dialog id="passwordDialog">
-    <div class="dialog-body">
-      <div>
-        <h3 style="font-family:'Inter',sans-serif;font-size:16.5px;font-weight:700;">Instructor access</h3>
-        <p class="help" style="margin-top:6px">Enter the instructor password to place the reference model on your workspace and overlay the correct connections.</p>
-      </div>
-      <label>
-        Password
-        <input id="enteredPassword" type="password" autocomplete="current-password">
-      </label>
-      <p id="passwordFeedback" class="error" aria-live="polite"></p>
-      <div class="dialog-actions">
-        <button id="cancelPasswordButton" class="btn" type="button">Cancel</button>
-        <button id="submitPasswordButton" class="btn primary" type="button">Reveal answer</button>
-      </div>
+  <div class="action-bar">
+    <div class="row">
+      <button id="resetButton" class="btn" type="button">Reset</button>
+      <button id="tidyButton" class="btn" type="button">Tidy</button>
     </div>
-  </dialog>
+    <button id="checkButton" class="btn check" type="button">Check diagram</button>
+  </div>
 </div>
 
-<script>
-  const INSTRUCTOR_PASSWORD = atob('stevens611');
+<div id="confettiLayer" aria-hidden="true"></div>
 
+<script>
   const briefScreen = document.getElementById('briefScreen');
   const toolScreen = document.getElementById('toolScreen');
   const beginButton = document.getElementById('beginButton');
@@ -668,17 +647,17 @@
   const connectionLines = document.getElementById('connectionLines');
   const answerLines = document.getElementById('answerLines');
   const dragLineLayer = document.getElementById('dragLineLayer');
-  const connBadge = document.getElementById('connBadge');
   const feedback = document.getElementById('feedback');
-  const reflection = document.getElementById('reflection');
-  const modelStatus = document.getElementById('modelStatus');
-  const attemptsValue = document.getElementById('attemptsValue');
-  const hintsValue = document.getElementById('hintsValue');
-  const hintsUsedText = document.getElementById('hintsUsedText');
+  const successPanel = document.getElementById('successPanel');
+  const reflectLink = document.getElementById('reflectLink');
+  const reflectNote = document.getElementById('reflectNote');
+  const statusPill = document.getElementById('statusPill');
+  const statusPillText = document.getElementById('statusPillText');
   const poolList = document.getElementById('poolList');
-  const passwordDialog = document.getElementById('passwordDialog');
-  const enteredPassword = document.getElementById('enteredPassword');
-  const passwordFeedback = document.getElementById('passwordFeedback');
+  const trayCount = document.getElementById('trayCount');
+  const legendToggle = document.getElementById('legendToggle');
+  const legendPopover = document.getElementById('legendPopover');
+  const confettiLayer = document.getElementById('confettiLayer');
 
   const definitions = [
     { id: 'start', label: 'Referee authorizes the kick', type: 'initial' },
@@ -730,8 +709,6 @@
   let onCanvas = new Set();
   let poolOrder = [];
   let attempts = 0;
-  let hintsUsed = 0;
-  let showAnswer = false;
   let connectDrag = null;
   let bodyDrag = null;
   let nodesInitialized = false;
@@ -771,16 +748,17 @@
   function renderPool() {
     poolList.innerHTML = '';
     const available = poolOrder.filter(id => !onCanvas.has(id));
+    trayCount.textContent = available.length ? `${available.length} remaining` : 'all placed';
     if (!available.length) {
-      poolList.innerHTML = '<p class="pool-empty">All cards placed.</p>';
+      poolList.innerHTML = '<p class="tray-empty">All candidate cards have been placed.</p>';
       return;
     }
     available.forEach(id => {
       const def = byId(id);
       const btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = 'pool-card';
-      btn.textContent = def.label;
+      btn.className = 'tray-card';
+      btn.innerHTML = `<span class="plus">+</span>${def.label}`;
       btn.addEventListener('click', () => addNodeToCanvas(id));
       poolList.appendChild(btn);
     });
@@ -789,11 +767,11 @@
   function nextSlot() { return onCanvas.size; }
   function slotPosition(slot) {
     const width = Math.max(workspace.clientWidth, 560);
-    const cols = 4;
+    const cols = Math.max(4, Math.floor(width / 160));
     const col = slot % cols;
     const row = Math.floor(slot / cols);
     const spacing = Math.max(150, (width - 190) / cols);
-    return { x: 18 + col * spacing + Math.random() * 18, y: 25 + row * 165 + Math.random() * 24 };
+    return { x: 18 + col * spacing, y: 22 + row * 150 };
   }
 
   function addNodeToCanvas(id) {
@@ -850,21 +828,73 @@
     if (node) node.remove();
     onCanvas.delete(id);
     connections = connections.filter(c => c.source !== id && c.target !== id);
-    updateBadge();
     renderPool();
     drawConnections();
   }
 
   function tidyLayout() {
-    const ids = Array.from(onCanvas);
-    const shuffled = shuffledIndices(ids.length);
-    ids.forEach((id, i) => {
+    // Layer nodes by shortest hop count from the start node along the
+    // student's own connections, so "tidy" actually reflects topology:
+    // start at top, branches fan out below, unconnected cards collect
+    // in a staging row so they're clearly separate from the flow.
+    const adjacency = {};
+    connections.forEach(c => { (adjacency[c.source] = adjacency[c.source] || []).push(c.target); });
+
+    const layer = new Map();
+    if (onCanvas.has('start')) {
+      layer.set('start', 0);
+      const queue = ['start'];
+      while (queue.length) {
+        const id = queue.shift();
+        (adjacency[id] || []).forEach(next => {
+          if (!layer.has(next) && onCanvas.has(next)) {
+            layer.set(next, layer.get(id) + 1);
+            queue.push(next);
+          }
+        });
+      }
+    }
+
+    const byLayer = new Map();
+    const unplaced = [];
+    Array.from(onCanvas).forEach(id => {
+      if (layer.has(id)) {
+        const l = layer.get(id);
+        if (!byLayer.has(l)) byLayer.set(l, []);
+        byLayer.get(l).push(id);
+      } else {
+        unplaced.push(id);
+      }
+    });
+
+    const width = Math.max(workspace.clientWidth, 560);
+    const colSpacing = 155;
+    const rowSpacing = 128;
+    const topPad = 24;
+
+    Array.from(byLayer.keys()).sort((a, b) => a - b).forEach(l => {
+      const ids = byLayer.get(l);
+      const rowWidth = ids.length * colSpacing;
+      const startX = Math.max(18, (width - rowWidth) / 2);
+      ids.forEach((id, i) => {
+        const node = nodeLayer.querySelector(`[data-id="${id}"]`);
+        if (!node) return;
+        node.style.left = `${startX + i * colSpacing}px`;
+        node.style.top = `${topPad + l * rowSpacing}px`;
+      });
+    });
+
+    // Unconnected cards sit in a staging row below whatever's laid out,
+    // clearly outside the traced flow rather than randomly scattered.
+    const stagingRow = byLayer.size ? Math.max(...byLayer.keys()) + 1 : 0;
+    unplaced.forEach((id, i) => {
       const node = nodeLayer.querySelector(`[data-id="${id}"]`);
       if (!node) return;
-      const pos = slotPosition(shuffled[i]);
+      const pos = slotPosition(i);
       node.style.left = `${pos.x}px`;
-      node.style.top = `${pos.y}px`;
+      node.style.top = `${topPad + stagingRow * rowSpacing}px`;
     });
+
     requestAnimationFrame(drawConnections);
   }
 
@@ -977,7 +1007,6 @@
 
   function addConnection(source, target, label) {
     connections.push({ source, target, label });
-    updateBadge();
     drawConnections(true);
   }
 
@@ -1022,20 +1051,6 @@
         connectionLines.appendChild(text);
       }
     });
-    if (showAnswer) drawAnswerOverlay();
-  }
-
-  function drawAnswerOverlay() {
-    answerLines.innerHTML = '';
-    correctEdges.forEach(e => {
-      const a = nodeCenter(e.source);
-      const b = nodeCenter(e.target);
-      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-      path.setAttribute('class', 'answer-line');
-      path.setAttribute('marker-end', 'url(#answerArrow)');
-      path.setAttribute('d', pathFor(a, b));
-      answerLines.appendChild(path);
-    });
   }
 
   function removeConnection(idx) {
@@ -1043,13 +1058,13 @@
     if (paths[idx]) paths[idx].classList.add('removing');
     setTimeout(() => {
       connections.splice(idx, 1);
-      updateBadge();
       drawConnections();
     }, 130);
   }
 
-  function updateBadge() {
-    connBadge.textContent = `${connections.length} connection${connections.length === 1 ? '' : 's'}`;
+  function setStatus(correct) {
+    statusPill.classList.toggle('correct', correct);
+    statusPillText.textContent = correct ? 'Correct' : 'In progress';
   }
 
   function submittedMap() {
@@ -1109,25 +1124,36 @@
     node.appendChild(icon);
   }
 
+  function appendHintLink() {
+    if (attempts < 2) return;
+    const link = document.createElement('button');
+    link.type = 'button';
+    link.className = 'hint-link';
+    link.textContent = 'Need a hint?';
+    link.addEventListener('click', giveHint);
+    feedback.querySelector('.feedback-head').appendChild(link);
+  }
+
   function checkDiagram() {
     attempts += 1;
-    attemptsValue.textContent = attempts;
     clearStatusIcons();
-    reflection.hidden = true;
+    successPanel.hidden = true;
+    reflectNote.hidden = true;
+    feedback.hidden = false;
 
     const result = evaluate();
 
     if (result.allCorrect) {
-      modelStatus.textContent = 'Correct';
-      feedback.className = 'feedback correct';
-      feedback.innerHTML = '<div class="feedback-head">Process logic is correct</div><p>Every required execution reaches a valid end, both decisions have mutually exclusive guards, and no out-of-scope cards made it into the model.</p>';
+      setStatus(true);
       document.querySelectorAll('.builder-node').forEach(n => { n.classList.add('correct'); addStatusIcon(n, 'correct', '\u2713'); });
-      reflection.hidden = false;
+      feedback.hidden = true;
+      successPanel.hidden = false;
       playSuccessAnimation();
+      fireConfetti();
       return;
     }
 
-    modelStatus.textContent = 'Needs revision';
+    setStatus(false);
 
     document.querySelectorAll('.builder-node').forEach(node => {
       const id = node.dataset.id;
@@ -1149,59 +1175,57 @@
       feedback.className = 'feedback flagged';
       const d = result.distractorsPresent[0];
       const more = result.distractorsPresent.length > 1 ? ` (${result.distractorsPresent.length - 1} more card${result.distractorsPresent.length > 2 ? 's' : ''} may also be out of scope.)` : '';
-      feedback.innerHTML = `<div class="feedback-head">Reconsider "${d.label}"</div><p>${d.reason}${more}</p>`;
+      feedback.innerHTML = `<div class="feedback-head"><span>Reconsider "${d.label}"</span></div><p>${d.reason}${more}</p>`;
     } else if (result.ambiguous.length) {
       feedback.className = 'feedback wrong';
       const d = result.ambiguous[0];
-      feedback.innerHTML = `<div class="feedback-head">Guards aren't mutually exclusive</div><p>"${d.label}" has two outgoing branches that use the same guard. Each branch out of a decision needs to represent a distinct, non-overlapping condition.</p>`;
+      feedback.innerHTML = `<div class="feedback-head"><span>Guards aren't mutually exclusive</span></div><p>"${d.label}" has two outgoing branches that use the same guard. Each branch out of a decision needs to represent a distinct, non-overlapping condition.</p>`;
     } else {
       const firstFail = result.traceResults.find(t => !t.passes);
       feedback.className = 'feedback wrong';
       if (attempts === 1 || !firstFail) {
-        feedback.innerHTML = `<div class="feedback-head">Revise the process logic</div><p>Your current model does not provide a complete execution path for ${firstFail ? firstFail.name : 'every outcome described in the brief'}.</p>`;
+        feedback.innerHTML = `<div class="feedback-head"><span>Revise the process logic</span></div><p>Your current model does not provide a complete execution path for ${firstFail ? firstFail.name : 'every outcome described in the brief'}.</p>`;
       } else {
         const [s, t] = firstFail.brokenStep;
-        feedback.innerHTML = `<div class="feedback-head">Revise the process logic</div><p>Trace ${firstFail.name}. Does your model reach "${findNodeLabel(t)}" from "${findNodeLabel(s)}"? Check both the connection and its guard label.</p>`;
+        feedback.innerHTML = `<div class="feedback-head"><span>Revise the process logic</span></div><p>Trace ${firstFail.name}. Does your model reach "${findNodeLabel(t)}" from "${findNodeLabel(s)}"? Check both the connection and its guard label.</p>`;
       }
     }
+    appendHintLink();
   }
 
   function giveHint() {
     const result = evaluate();
-    hintsUsed += 1;
-    hintsValue.textContent = hintsUsed;
-    hintsUsedText.textContent = `${hintsUsed} hint${hintsUsed === 1 ? '' : 's'} used`;
     feedback.className = 'feedback';
 
     if (result.distractorsPresent.length) {
       const d = result.distractorsPresent[0];
-      feedback.innerHTML = `<div class="feedback-head">Hint</div><p>Look again at "${d.label}" &mdash; is it something your model should represent, given the boundary and abstraction rule in the brief?</p>`;
+      feedback.innerHTML = `<div class="feedback-head"><span>Hint</span></div><p>Look again at "${d.label}" &mdash; is it something your model should represent, given the boundary and abstraction rule in the brief?</p>`;
       return;
     }
     if (result.ambiguous.length) {
       const d = result.ambiguous[0];
-      feedback.innerHTML = `<div class="feedback-head">Hint</div><p>"${d.label}" needs two branches whose guards can never both be true at once.</p>`;
+      feedback.innerHTML = `<div class="feedback-head"><span>Hint</span></div><p>"${d.label}" needs two branches whose guards can never both be true at once.</p>`;
       return;
     }
 
     const firstFail = result.traceResults.find(t => !t.passes);
     if (!firstFail) {
-      feedback.innerHTML = `<div class="feedback-head">Hint</div><p>Your diagram looks complete &mdash; try checking it.</p>`;
+      feedback.innerHTML = `<div class="feedback-head"><span>Hint</span></div><p>Your diagram looks complete &mdash; try checking it.</p>`;
       return;
     }
     if (lastHintTrace !== firstFail.name) { lastHintTrace = firstFail.name; hintLevelForTrace = 1; }
     else { hintLevelForTrace = Math.min(hintLevelForTrace + 1, 3); }
 
     if (hintLevelForTrace === 1) {
-      feedback.innerHTML = `<div class="feedback-head">Hint</div><p>Your current model doesn't provide a complete execution path for ${firstFail.name}.</p>`;
+      feedback.innerHTML = `<div class="feedback-head"><span>Hint</span></div><p>Your current model doesn't provide a complete execution path for ${firstFail.name}.</p>`;
     } else if (hintLevelForTrace === 2) {
       const [s, t] = firstFail.brokenStep;
-      feedback.innerHTML = `<div class="feedback-head">Hint</div><p>Trace that case step by step. Can it get from "${findNodeLabel(s)}" to "${findNodeLabel(t)}" and on to the final node?</p>`;
+      feedback.innerHTML = `<div class="feedback-head"><span>Hint</span></div><p>Trace that case step by step. Can it get from "${findNodeLabel(s)}" to "${findNodeLabel(t)}" and on to the final node?</p>`;
     } else {
       const [s, t] = firstFail.brokenStep;
       const expected = correctByKey.get(structKey(s, t));
       const guardHint = expected && expected.label ? ` labeled [${expected.label}]` : '';
-      feedback.innerHTML = `<div class="feedback-head">Hint</div><p>You need a connection from "${findNodeLabel(s)}" to "${findNodeLabel(t)}"${guardHint}.</p>`;
+      feedback.innerHTML = `<div class="feedback-head"><span>Hint</span></div><p>You need a connection from "${findNodeLabel(s)}" to "${findNodeLabel(t)}"${guardHint}.</p>`;
     }
   }
 
@@ -1238,66 +1262,74 @@
     step();
   }
 
+  // A short, restrained burst — not continuous, no modal. The completed
+  // diagram stays fully visible underneath it.
+  function fireConfetti() {
+    const colors = ['#2BB4E0', '#167A46', '#166B8C', '#F4C95D'];
+    const count = 46;
+    for (let i = 0; i < count; i++) {
+      const piece = document.createElement('div');
+      piece.className = 'confetti-piece';
+      const size = 6 + Math.random() * 5;
+      piece.style.width = `${size}px`;
+      piece.style.height = `${size * 0.4}px`;
+      piece.style.left = `${Math.random() * 100}vw`;
+      piece.style.background = colors[i % colors.length];
+      const duration = 900 + Math.random() * 500;
+      const rotate = 180 + Math.random() * 360;
+      const drift = (Math.random() - 0.5) * 120;
+      piece.style.transition = `transform ${duration}ms cubic-bezier(.25,.6,.4,1), opacity ${duration}ms ease`;
+      confettiLayer.appendChild(piece);
+      requestAnimationFrame(() => {
+        piece.style.opacity = '1';
+        piece.style.transform = `translate(${drift}px, ${window.innerHeight * 0.55}px) rotate(${rotate}deg)`;
+      });
+      setTimeout(() => { piece.style.opacity = '0'; }, duration - 150);
+      setTimeout(() => piece.remove(), duration + 200);
+    }
+  }
+
   function resetAll() {
     connections = [];
     onCanvas = new Set();
     attempts = 0;
-    hintsUsed = 0;
     lastHintTrace = null;
     hintLevelForTrace = 0;
-    showAnswer = false;
-    answerLines.innerHTML = '';
     nodeLayer.innerHTML = '';
     document.querySelectorAll('.guard-picker').forEach(p => p.remove());
-    attemptsValue.textContent = '0';
-    hintsValue.textContent = '0';
-    hintsUsedText.textContent = '0 hints used';
-    document.getElementById('answerButton').textContent = 'Instructor answer';
-    reflection.hidden = true;
     clearStatusIcons();
     poolOrder = shuffledIndices(definitions.length).map(i => definitions[i].id);
     renderPool();
-    updateBadge();
-    modelStatus.textContent = 'Incomplete';
+    setStatus(false);
+    successPanel.hidden = true;
+    reflectNote.hidden = true;
+    feedback.hidden = false;
     feedback.className = 'feedback';
-    feedback.innerHTML = '<div class="feedback-head">Your task</div><p>Add the cards you think belong, connect them, and choose a guard label at each decision. Every possible outcome should reach a valid end.</p>';
+    feedback.innerHTML = '<div class="feedback-head"><span>Your task</span></div><p>Add the cards you think belong, connect them, and choose a guard label at each decision. Every possible outcome should reach a valid end.</p>';
+    drawConnections();
   }
 
   document.getElementById('checkButton').addEventListener('click', checkDiagram);
-  document.getElementById('hintButton').addEventListener('click', giveHint);
   document.getElementById('tidyButton').addEventListener('click', tidyLayout);
   document.getElementById('resetButton').addEventListener('click', resetAll);
 
-  document.getElementById('answerButton').addEventListener('click', () => {
-    if (showAnswer) {
-      showAnswer = false;
-      answerLines.innerHTML = '';
-      document.getElementById('answerButton').textContent = 'Instructor answer';
-      return;
-    }
-    enteredPassword.value = '';
-    passwordFeedback.textContent = '';
-    passwordDialog.showModal();
+  reflectLink.addEventListener('click', () => {
+    reflectNote.hidden = !reflectNote.hidden;
   });
-  document.getElementById('cancelPasswordButton').addEventListener('click', () => passwordDialog.close());
-  document.getElementById('submitPasswordButton').addEventListener('click', () => {
-    if (enteredPassword.value !== INSTRUCTOR_PASSWORD) {
-      passwordFeedback.textContent = 'Incorrect password.';
-      return;
-    }
-    passwordDialog.close();
-    definitions.filter(d => !d.isDistractor && !onCanvas.has(d.id)).forEach(d => addNodeToCanvas(d.id));
-    showAnswer = true;
-    document.getElementById('answerButton').textContent = 'Hide answer';
-    drawConnections();
+
+  legendToggle.addEventListener('click', () => {
+    const willShow = legendPopover.hidden;
+    legendPopover.hidden = !willShow;
+    legendToggle.setAttribute('aria-expanded', String(willShow));
   });
-  enteredPassword.addEventListener('keydown', e => {
-    if (e.key === 'Enter') document.getElementById('submitPasswordButton').click();
+  document.addEventListener('pointerdown', e => {
+    if (!legendPopover.hidden && !legendPopover.contains(e.target) && e.target !== legendToggle) {
+      legendPopover.hidden = true;
+      legendToggle.setAttribute('aria-expanded', 'false');
+    }
   });
 
   window.addEventListener('resize', () => { if (nodesInitialized) drawConnections(); });
-
-  updateBadge();
 </script>
 </body>
 </html>
