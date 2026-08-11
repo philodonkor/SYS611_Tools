@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SYS 611 Activity Diagram Lab</title>
+<title>SYS 611: Tic Tac Toe Logic</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
@@ -730,31 +730,59 @@ body{ background:var(--paper); }
 .test-debug{ display:none; margin-top:9px; padding-top:9px; border-top:1px dashed var(--line); font-family:'IBM Plex Mono',monospace; font-size:10.5px; line-height:1.6; color:var(--ink-muted); }
 .test-debug.open{display:block}.test-debug b{color:var(--ink)}
 
-/* Stage 3: direct pattern recognition */
+/* Stage 3: build the winning-line implementation */
 .scr-pw .content{ background:var(--paper); padding:28px; min-height:calc(100vh - 130px); }
-.scr-pw .layout{ max-width:980px; margin:0 auto; }
-.pw-lab{ display:grid; grid-template-columns:minmax(360px,.95fr) minmax(300px,1.05fr); gap:22px; align-items:start; }
-.pw-board-card,.pw-task-card{ background:#fff; border:1px solid var(--line); border-radius:16px; padding:20px; }
-.pw-progress{ display:flex; gap:7px; flex-wrap:wrap; margin-bottom:14px; }
-.pw-progress button{ width:28px;height:28px;border-radius:50%;border:1.5px solid var(--line);background:var(--paper);font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:700;color:var(--ink-muted); }
-.pw-progress button.active{border-color:var(--cyan);color:#0E6E90;background:var(--cyan-faint)}
-.pw-progress button.pass{border-color:var(--success);background:var(--success);color:#fff}
-.pw-progress button.fail{border-color:var(--danger);background:var(--danger-bg);color:var(--danger)}
-.pw-board-large{ display:grid; grid-template-columns:repeat(3,92px); gap:7px; width:fit-content; margin:18px auto; }
-.pw-cell{ width:92px;height:92px;border:1.5px solid var(--line);border-radius:11px;background:var(--paper);font-family:'Barlow Condensed',sans-serif;font-size:43px;font-weight:700;color:var(--ink);transition:.12s ease; }
-.pw-cell.x{color:#0E5C79}.pw-cell.o{color:#993C1D}
-.pw-cell.selectable:hover{border-color:var(--cyan);background:var(--cyan-faint)}
-.pw-cell.selected{border:3px solid var(--cyan);background:var(--cyan-faint);box-shadow:0 0 0 3px rgba(43,180,224,.14)}
-.pw-cell.answer{border-color:var(--success);background:var(--success-bg)}
-.pw-call-row{ display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-top:15px; }
-.pw-call-btn{border:1.5px solid var(--line);background:var(--paper);padding:11px;border-radius:9px;font-weight:700;color:var(--ink)}
-.pw-call-btn.selected{border-color:var(--cyan);background:var(--cyan-faint);color:#0E5C79}
-.pw-instruction{ min-height:40px; font-size:12.5px; color:var(--ink-muted); line-height:1.5; margin-top:11px; }
-.pw-check{width:100%;margin-top:13px;border:0;background:var(--cyan);color:#062230;border-radius:9px;padding:11px;font-weight:700}.pw-check:disabled{opacity:.38;cursor:not-allowed}
-.pw-feedback{margin-top:13px;border-radius:10px;padding:12px 13px;font-size:12.5px;line-height:1.5;border:1px solid var(--line)}
-.pw-feedback.pass{background:var(--success-bg);border-color:var(--success)}.pw-feedback.fail{background:var(--danger-bg);border-color:var(--danger)}
-.pw-nav{display:flex;justify-content:space-between;gap:9px;margin-top:13px}.pw-nav button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px 12px;font-weight:600;font-size:12px}.pw-nav button:disabled{opacity:.35}
-.pw-concept{font-family:'IBM Plex Mono',monospace;font-size:12px;line-height:1.75;background:#111319;color:#C9D1D9;border-radius:12px;padding:15px;margin-top:12px}.pw-concept .kw{color:#C4B5FD}.pw-concept .fn{color:#7DD3FC}
+.scr-pw .layout{ max-width:1080px; margin:0 auto; }
+.pw-builder{ display:grid; grid-template-columns:minmax(360px,.9fr) minmax(400px,1.1fr); gap:22px; align-items:start; }
+.pw-panel{ background:#fff; border:1px solid var(--line); border-radius:16px; padding:20px; }
+.pw-panel-kicker{ font-family:'IBM Plex Mono',monospace; color:#0E6E90; font-size:10.5px; text-transform:uppercase; letter-spacing:.07em; }
+.pw-panel h2{ font-family:'Barlow Condensed',sans-serif; text-transform:uppercase; font-size:23px; margin:5px 0 7px; }
+.pw-panel-copy{ font-size:12.5px; color:var(--ink-muted); line-height:1.55; }
+.pw-index-board{ display:grid; grid-template-columns:repeat(3,104px); gap:7px; width:fit-content; margin:20px auto 14px; }
+.pw-index-cell{ position:relative; width:104px; height:104px; border:1.5px solid var(--line); border-radius:12px; background:var(--paper); color:var(--ink); transition:.12s ease; }
+.pw-index-cell:hover:not(:disabled){ border-color:var(--cyan); background:var(--cyan-faint); transform:translateY(-1px); }
+.pw-index-cell.selected{ border:2.5px solid var(--cyan); background:var(--cyan-faint); box-shadow:0 0 0 3px rgba(43,180,224,.13); }
+.pw-index-cell.preview{ border-color:#8B5CF6; background:#F3EEFF; }
+.pw-index-cell:disabled{ cursor:default; }
+.pw-index-num{ font-family:'IBM Plex Mono',monospace; font-size:25px; font-weight:600; }
+.pw-index-label{ position:absolute; left:8px; top:7px; font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:#8B93A0; }
+.pw-select-order{ position:absolute; right:7px; top:7px; width:21px; height:21px; border-radius:50%; background:var(--cyan); color:#062230; display:grid; place-items:center; font-family:'IBM Plex Mono',monospace; font-size:10px; font-weight:700; }
+.pw-selection-readout{ min-height:40px; padding:10px 12px; border:1px dashed var(--line); border-radius:9px; background:#FAFBFC; font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--ink-muted); line-height:1.5; }
+.pw-selection-readout b{ color:var(--ink); }
+.pw-add-check{ width:100%; margin-top:10px; border:0; background:var(--cyan); color:#062230; border-radius:9px; padding:11px; font-weight:700; }
+.pw-add-check:disabled{ opacity:.36; cursor:not-allowed; }
+.pw-builder-note{ margin-top:10px; font-size:11.5px; color:var(--ink-muted); line-height:1.5; }
+.pw-function-shell{ border:1px solid #292D35; background:#111319; border-radius:13px; overflow:hidden; }
+.pw-function-head{ padding:10px 13px; border-bottom:1px solid #2A2E37; display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.pw-function-body{ padding:14px; }
+.pw-code-line{ font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:#C9D1D9; line-height:1.7; }
+.pw-code-line .kw{color:#C4B5FD}.pw-code-line .fn{color:#7DD3FC}.pw-code-line .dim{color:#697384}
+.pw-check-count{ margin:14px 0 8px; display:flex; justify-content:space-between; align-items:baseline; gap:10px; }
+.pw-check-count strong{ font-family:'Barlow Condensed',sans-serif; text-transform:uppercase; font-size:17px; }
+.pw-check-count span{ font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--ink-muted); }
+.pw-check-list{ display:grid; gap:7px; max-height:292px; overflow:auto; padding-right:2px; }
+.pw-check-empty{ border:1px dashed #333944; color:#737D8A; border-radius:8px; padding:12px; font-family:'IBM Plex Mono',monospace; font-size:10.5px; line-height:1.5; }
+.pw-check-row{ display:grid; grid-template-columns:1fr auto; align-items:center; gap:8px; border:1px solid #2A3039; background:#171A20; border-radius:8px; overflow:hidden; }
+.pw-check-main{ border:0; background:transparent; color:#B9E7F5; text-align:left; padding:9px 11px; font-family:'IBM Plex Mono',monospace; font-size:11.5px; }
+.pw-check-main:hover{ background:#1E252C; }
+.pw-check-remove{ border:0; border-left:1px solid #2A3039; background:transparent; color:#8B93A0; width:36px; align-self:stretch; font-size:16px; }
+.pw-check-remove:hover{ color:#FCA5A5; background:#241A1D; }
+.pw-run-tests{ width:100%; margin-top:14px; border:0; background:var(--cyan); color:#062230; border-radius:9px; padding:11px; font-weight:700; }
+.pw-run-tests:disabled{opacity:.36;cursor:not-allowed}
+.pw-results{ margin-top:18px; }
+.pw-test-summary{ border-radius:12px; padding:15px 17px; margin-bottom:12px; border:1px solid var(--line); background:#fff; }
+.pw-test-summary.pass{background:var(--success-bg);border-color:var(--success)}
+.pw-test-summary.fail{background:var(--danger-bg);border-color:var(--danger)}
+.pw-test-summary strong{font-size:14px}.pw-test-summary p{font-size:12.5px;color:var(--ink-muted);line-height:1.5;margin-top:4px}
+.pw-test-list{ display:grid; gap:8px; }
+.pw-test-row{ display:grid; grid-template-columns:28px 1fr auto; gap:10px; align-items:start; border:1px solid var(--line); background:#fff; border-radius:10px; padding:11px 12px; }
+.pw-test-row.pass{border-color:#B9DFC8}.pw-test-row.fail{border-color:var(--danger);background:var(--danger-bg)}
+.pw-test-icon{ width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:12px;background:var(--success-bg);color:var(--success); }
+.pw-test-row.fail .pw-test-icon{background:#fff;color:var(--danger)}
+.pw-test-name{font-weight:700;font-size:12.5px}.pw-test-detail{font-size:11.5px;color:var(--ink-muted);line-height:1.45;margin-top:3px}
+.pw-test-cells{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#0E6E90;white-space:nowrap;padding-top:2px}
+.pw-continue{ width:100%; margin-top:10px; border:0; background:var(--success); color:#fff; border-radius:9px; padding:11px; font-weight:700; }
+.pw-locked-note{ margin-top:10px; font-size:11.5px; color:var(--ink-muted); text-align:center; }
 
 /* Stage 4 condition blocks */
 .scr-bf .option{ display:flex; align-items:center; justify-content:space-between; }
@@ -762,6 +790,16 @@ body{ background:var(--paper); }
 .scr-bf .option.selected::after{content:'✓'}
 .scr-bf .test-card .debug-line{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--ink-muted);margin-top:7px;line-height:1.5}
 
+
+/* Stage 2: guard-clause debugger */
+.scr-vm .content{padding:26px 28px 60px}.vm-lab{max-width:1120px;margin:0 auto}.vm-builder-grid{display:grid;grid-template-columns:minmax(320px,.8fr) minmax(430px,1.2fr);gap:22px;align-items:start}.vm-panel{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px}.vm-panel-kicker,.bf-panel-kicker{font-family:'IBM Plex Mono',monospace;color:#0E6E90;font-size:10.5px;text-transform:uppercase;letter-spacing:.07em}.vm-panel h2,.bf-panel h2{font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;font-size:23px;margin:5px 0 7px}.vm-panel-copy,.bf-panel-copy{font-size:12.5px;color:var(--ink-muted);line-height:1.55}.vm-guard-library,.bf-block-library{display:grid;gap:8px;margin-top:16px}.vm-guard-btn,.bf-block-btn{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;border:1.5px solid var(--line);background:var(--paper);border-radius:10px;padding:11px 12px;text-align:left;color:var(--ink)}.vm-guard-btn:hover:not(:disabled),.bf-block-btn:hover:not(:disabled){border-color:var(--cyan);background:var(--cyan-faint)}.vm-guard-btn.used,.bf-block-btn.used{border-color:#B7D9E6;background:#F3FAFC}.vm-guard-btn b,.bf-block-btn b{display:block;font-size:12.5px}.vm-guard-btn small,.bf-block-btn small{display:block;margin-top:3px;color:var(--ink-muted);font-family:'IBM Plex Mono',monospace;font-size:9.5px}.vm-add-mark{font-family:'IBM Plex Mono',monospace;color:#0E6E90;font-weight:700}.vm-builder-note,.bf-builder-note{font-size:11.5px;color:var(--ink-muted);line-height:1.5;margin-top:12px}.vm-function-shell,.bf-function-shell{margin-top:16px;border:1px solid #292D35;background:#111319;border-radius:13px;overflow:hidden}.vm-function-head,.bf-function-head{padding:10px 13px;border-bottom:1px solid #2A2E37;display:flex;align-items:center;justify-content:space-between;gap:10px}.vm-program,.bf-program{padding:14px;color:#C9D1D9;font-family:'IBM Plex Mono',monospace;font-size:11.5px;line-height:1.7}.vm-code-indent,.bf-code-indent{padding-left:16px;display:grid;gap:7px}.vm-code-line,.bf-code-line{min-height:20px}.vm-code-empty,.bf-code-empty{color:#697384;font-style:italic}.vm-code-row,.bf-code-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;border:1px solid #2A3039;background:#171A20;border-radius:8px;padding:8px 8px 8px 10px}.vm-code-text .kw,.bf-program .kw{color:#C4B5FD}.vm-code-text .false,.vm-program .false{color:#FCA5A5}.vm-program .true{color:#86EFAC}.vm-program .fn,.bf-program .fn{color:#7DD3FC}.vm-row-actions,.bf-row-actions{display:flex;gap:3px}.vm-row-actions button,.bf-row-actions button{border:0;background:#22262E;color:#9AA3AF;border-radius:5px;width:25px;height:25px;font-size:11px}.vm-row-actions button:hover:not(:disabled),.bf-row-actions button:hover:not(:disabled){background:#303640;color:#fff}.vm-row-actions button:disabled,.bf-row-actions button:disabled{opacity:.25}.vm-builder-actions,.bf-builder-actions{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:13px}.vm-count,.bf-count{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--ink-muted)}.vm-run-tests,.bf-run-tests{border:0;background:var(--cyan);color:#062230;border-radius:9px;padding:11px 16px;font-weight:700}.vm-locked-note,.bf-locked-note{margin-top:10px;font-size:11.5px;color:var(--ink-muted);text-align:right}.vm-results,.bf-results{margin-top:18px}.vm-summary,.bf-summary{border:1px solid var(--line);border-radius:12px;padding:15px 17px;background:#fff;margin-bottom:12px}.vm-summary.pass,.bf-summary.pass{background:var(--success-bg);border-color:var(--success)}.vm-summary.fail,.bf-summary.fail{background:var(--danger-bg);border-color:var(--danger)}.vm-summary strong,.bf-summary strong{font-size:14px}.vm-summary p,.bf-summary p{font-size:12.5px;color:var(--ink-muted);line-height:1.5;margin-top:4px}.vm-continue,.bf-continue{margin-top:10px;width:100%;border:0;background:var(--success);color:#fff;border-radius:9px;padding:11px;font-weight:700}.vm-test-list,.bf-test-list{display:grid;gap:8px}.vm-test-row,.bf-test-row{display:grid;grid-template-columns:28px 1fr;gap:10px;border:1px solid var(--line);background:#fff;border-radius:10px;padding:12px}.vm-test-row.fail,.bf-test-row.fail{border-color:var(--danger);background:var(--danger-bg)}.vm-test-icon,.bf-test-icon{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:12px;background:var(--success-bg);color:var(--success)}.vm-test-row.fail .vm-test-icon,.bf-test-row.fail .bf-test-icon{background:#fff;color:var(--danger)}.vm-test-name,.bf-test-name{font-weight:700;font-size:12.5px}.vm-test-desc,.bf-test-desc{font-size:11.5px;color:var(--ink-muted);line-height:1.45;margin-top:2px}.vm-test-verdict,.bf-test-verdict{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--ink-muted);margin-top:6px}.vm-debug-toggle,.bf-trace-toggle{border:0;background:transparent;color:#0E6E90;padding:0;margin-top:8px;font-size:11.5px;font-weight:700}.vm-debug-detail,.bf-trace-detail{display:none;margin-top:10px;border-top:1px solid rgba(0,0,0,.08);padding-top:10px}.vm-debug-detail.open,.bf-trace-detail.open{display:block}.vm-debug-board,.bf-trace-board{display:grid;grid-template-columns:repeat(3,44px);gap:4px;width:fit-content;margin-bottom:9px}.vm-debug-cell,.bf-trace-cell{position:relative;width:44px;height:44px;border:1px solid var(--line);border-radius:6px;background:#fff;display:grid;place-items:center;font-weight:700}.vm-debug-cell span,.bf-cell-index{position:absolute;left:4px;top:2px;font-family:'IBM Plex Mono',monospace;font-size:8px;color:#8B93A0}.vm-debug-cell.target{border:2px dashed var(--cyan);background:var(--cyan-faint)}.vm-debug-cell.x,.bf-trace-cell.x{color:#0E5C79}.vm-debug-cell.o,.bf-trace-cell.o{color:#993C1D}.vm-debug-context{font-size:11px;color:var(--ink-muted);line-height:1.5;margin-bottom:8px}.vm-trace,.bf-trace-list{display:grid;gap:5px}.vm-trace-step,.bf-trace-step{display:grid;grid-template-columns:22px 1fr;gap:7px;align-items:start;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink-muted)}.vm-trace-step>span,.bf-trace-step>span{width:19px;height:19px;border-radius:50%;background:#EEF1F4;display:grid;place-items:center;font-size:8px}.vm-trace-step b{display:block;color:var(--ink);font-family:'Inter',sans-serif;font-size:11px}.vm-trace-step small{display:block;margin-top:1px}.bf-trace-step.error{color:var(--danger)}
+
+/* Stage 4: ordered iteration builder */
+.scr-bf .content{padding:26px 28px 60px}.bf-lab{max-width:1120px;margin:0 auto}.bf-builder-grid{display:grid;grid-template-columns:minmax(320px,.8fr) minmax(430px,1.2fr);gap:22px;align-items:start}.bf-panel{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px}.bf-code-row.indented{margin-left:18px;border-left:3px solid #2BB4E0}.bf-code-text{color:#C9D1D9}.bf-trace-cell.scanned{border-color:#7DD3FC;background:#F1FAFD}.bf-scan-order{position:absolute;right:3px;top:3px;width:16px;height:16px;border-radius:50%;background:#2BB4E0;color:#062230;font-family:'IBM Plex Mono',monospace;font-size:8px;display:grid;place-items:center}.bf-trace-step.scan{color:#0E6E90}.bf-trace-step.return{color:var(--success)}.bf-trace-step.loopDone{color:#6D5DA8}
+
+.runtime-row .detail{color:#8B93A0;font-size:10.5px}
+
+@media(max-width:900px){.vm-builder-grid,.bf-builder-grid{grid-template-columns:1fr}}
 /* Stage 5: game + runtime */
 .scr-pl .layout{ max-width:1000px; }
 .play-shell{ display:grid; grid-template-columns:minmax(360px,.9fr) minmax(360px,1.1fr); gap:20px; align-items:start; }
@@ -785,11 +823,11 @@ body{ background:var(--paper); }
   .lab-intro-visual{grid-template-columns:1fr}.intro-connector{transform:rotate(90deg)}
   .intro-pipeline{grid-template-columns:1fr 1fr}
   .scr-dg .layout{grid-template-columns:1fr}.scr-dg .sidebar{position:static}.scr-dg #dg_workspace{min-height:620px}
-  .pw-lab,.play-shell{grid-template-columns:1fr}.play-log-card{position:static}
+  .pw-builder,.play-shell{grid-template-columns:1fr}.play-log-card{position:static}
 }
 @media(max-width:620px){
   .intro-pipeline{grid-template-columns:1fr}.lab-intro h1{font-size:44px}
-  .pw-board-large{grid-template-columns:repeat(3,76px)}.pw-cell{width:76px;height:76px;font-size:36px}
+  .pw-index-board{grid-template-columns:repeat(3,82px)}.pw-index-cell{width:82px;height:82px}.pw-index-num{font-size:22px}
 }
 @media(prefers-reduced-motion:reduce){.confetti-piece{display:none!important}}
 
@@ -826,7 +864,7 @@ body{ background:var(--paper); }
       <div class="intro-stage"><b>1 · Build the flow</b><span>Connect the game loop and stress-test it.</span></div>
       <div class="intro-stage"><b>2 · Move rule</b><span>Implement <code>validMove()</code>.</span></div>
       <div class="intro-stage"><b>3 · Win rule</b><span>Recognize winning patterns.</span></div>
-      <div class="intro-stage"><b>4 · Draw rule</b><span>Implement <code>boardFull()</code>.</span></div>
+      <div class="intro-stage"><b>4 · Board full</b><span>Build the scan inside <code>boardFull()</code>.</span></div>
       <div class="intro-stage"><b>5 · Run it</b><span>Play the system you built.</span></div>
     </div>
 
@@ -924,92 +962,94 @@ body{ background:var(--paper); }
 </section>
 
 <section id="screen-vm" class="scr-vm" style="display:none;">
-
-
   <div class="topbar">
-    <div class="eyebrow">Stage 2 of 5 &middot; Implement a decision</div>
+    <div class="eyebrow">Stage 2 of 5 &middot; Build validation guards</div>
     <h1>Implement validMove()</h1>
-    <p class="subtitle">Your flow asks whether a move is valid. Now define what that function actually means. Add only the conditions the game needs, combine them, and run the test suite.</p>
+    <p class="subtitle">Start with a function that accepts everything. Add rejection guards, run the test suite, and use counterexamples to discover exactly what a valid move must protect against.</p>
   </div>
 
   <div class="content">
-    <div class="layout">
+    <div class="vm-lab">
+      <div class="vm-builder-grid">
+        <section class="vm-panel">
+          <div class="vm-panel-kicker">Guard library</div>
+          <h2>Add a rejection check</h2>
+          <p class="vm-panel-copy">Each block becomes an <code>if (...) return false</code> guard. Some are useful; others will reject perfectly valid moves.</p>
+          <div id="vm_guardLibrary" class="vm-guard-library"></div>
+          <p class="vm-builder-note">Run tests whenever you want—even with no guards. A failing case is evidence about what your function still needs.</p>
+        </section>
 
-      <div class="card">
-        <h2>Logic blocks</h2>
-        <div class="palette" id="vm_palette"></div>
-        <p class="builder-help">Click a block to add it to the function. Order does not matter here; the operator between conditions does.</p>
-      </div>
-
-      <div class="card">
-        <h2>Function editor</h2>
-        <div class="function-shell">
-          <div class="function-shell-head"><span class="function-label">Function</span><span class="function-name">validMove(targetCell)</span></div>
-          <div class="function-body">
-            <div class="return-label">return</div>
-            <div class="rule-area" id="vm_ruleArea"><p class="rule-empty">choose a logic block…</p></div>
+        <section class="vm-panel">
+          <div class="vm-panel-kicker">Visual function builder</div>
+          <h2>Your implementation</h2>
+          <div class="vm-function-shell">
+            <div class="vm-function-head"><span class="function-label">Function</span><span class="function-name">validMove(board, target, status)</span></div>
+            <div id="vm_program" class="vm-program"></div>
           </div>
-        </div>
-        <button class="btn primary" id="vm_runTestsBtn">▶ Run test suite</button>
+          <div class="vm-builder-actions">
+            <span id="vm_guardCount" class="vm-count"></span>
+            <button type="button" class="vm-run-tests" id="vm_runTestsBtn">▶ Run stress tests</button>
+          </div>
+          <div id="vm_lockedNote"></div>
+        </section>
       </div>
-
-      <div class="results" id="vm_results"></div>
-
+      <div class="vm-results" id="vm_results"></div>
     </div>
   </div>
-
-
 </section>
 
 <section id="screen-pw" class="scr-pw" style="display:none;">
 
-
   <div class="topbar">
-    <div class="eyebrow">Stage 3 of 5 &middot; Implement pattern recognition</div>
+    <div class="eyebrow">Stage 3 of 5 &middot; Implement the win detector</div>
     <h1>Implement playerWon()</h1>
-    <p class="subtitle">Read the board directly. Decide whether it contains a winning line; when it does, select the three cells that form that line.</p>
+    <p class="subtitle">Define every set of board cells that could make a winning line. Add the checks your function needs, then stress-test the implementation against wins and false positives.</p>
   </div>
 
   <div class="content">
     <div class="layout">
-      <div id="pw_summary"></div>
-      <div id="pw_lab" class="pw-lab"></div>
+      <div id="pw_lab" class="pw-builder"></div>
+      <div id="pw_results" class="pw-results"></div>
     </div>
   </div>
-
 
 </section>
 
 <section id="screen-bf" class="scr-bf" style="display:none;">
-
-
   <div class="topbar">
-    <div class="eyebrow">Stage 4 of 5 &middot; Implement the draw condition</div>
+    <div class="eyebrow">Stage 4 of 5 &middot; Build an iteration</div>
     <h1>Implement boardFull()</h1>
-    <p class="subtitle">Complete the function with the condition that determines whether the board has any space left. Then test that definition against different game states.</p>
+    <p class="subtitle">Build the tiny program that scans a board and decides whether every cell is occupied. Statement order matters, and an early return can stop the scan immediately.</p>
   </div>
 
   <div class="content">
-    <div class="layout">
+    <div class="bf-lab">
+      <div class="bf-builder-grid">
+        <section class="bf-panel">
+          <div class="bf-panel-kicker">Program blocks</div>
+          <h2>Assemble the scan</h2>
+          <p class="bf-panel-copy">Add statements to the function, then reorder them until the execution does what you intend. Some blocks are plausible bugs.</p>
+          <div id="bf_blockLibrary" class="bf-block-library"></div>
+          <p class="bf-builder-note">A good implementation can stop as soon as it finds evidence that the board is not full.</p>
+        </section>
 
-      <div class="card">
-        <h2>Function editor</h2>
-        <div class="function-shell" style="margin-bottom:14px;">
-          <div class="function-shell-head"><span class="function-label">Function</span><span class="function-name">boardFull(board)</span></div>
-          <div class="function-body">
-            <div class="return-label">return</div>
-            <div id="bf_options"></div>
+        <section class="bf-panel">
+          <div class="bf-panel-kicker">Visual function builder</div>
+          <h2>Your implementation</h2>
+          <div class="bf-function-shell">
+            <div class="bf-function-head"><span class="function-label">Function</span><span class="function-name">boardFull(board)</span></div>
+            <div id="bf_program" class="bf-program"></div>
           </div>
-        </div>
-        <button class="btn primary" id="bf_runBtn">▶ Run test suite</button>
+          <div class="bf-builder-actions">
+            <span id="bf_blockCount" class="bf-count"></span>
+            <button type="button" class="bf-run-tests" id="bf_runBtn">▶ Run stress tests</button>
+          </div>
+          <div id="bf_lockedNote"></div>
+        </section>
       </div>
-
-      <div id="bf_results"></div>
-
+      <div id="bf_results" class="bf-results"></div>
     </div>
   </div>
-
-
 </section>
 
 <section id="screen-pl" class="scr-pl" style="display:none;">
@@ -1032,22 +1072,22 @@ body{ background:var(--paper); }
 // ==================================================================
 // SHARED SHELL: cross-module state, screen switching, stepper nav
 // ==================================================================
-window.SYS611 = { diagram: null, rule: null, boardFullDef: null, playerWonPassed: false, playLaunched: false };
+window.SYS611 = { diagram: null, rule: null, winningLines: null, boardFullProgram: null, playerWonPassed: false, playLaunched: false };
 window.SYS611_unlocked = { dg: true, vm: false, pw: false, bf: false, pl: false };
 
 const SCREEN_META = {
   dg: { num: 1, label: 'Flow' },
   vm: { num: 2, label: 'Move rule' },
   pw: { num: 3, label: 'Win rule' },
-  bf: { num: 4, label: 'Draw rule' },
+  bf: { num: 4, label: 'Board full' },
   pl: { num: 5, label: 'Run game' },
 };
 
 function isStageComplete(id) {
   if (id === 'dg') return !!window.SYS611.diagram;
   if (id === 'vm') return !!window.SYS611.rule;
-  if (id === 'pw') return !!window.SYS611.playerWonPassed;
-  if (id === 'bf') return !!window.SYS611.boardFullDef;
+  if (id === 'pw') return !!window.SYS611.playerWonPassed && !!window.SYS611.winningLines;
+  if (id === 'bf') return !!window.SYS611.boardFullProgram;
   return false;
 }
 
@@ -1699,359 +1739,339 @@ renderStepper('dg');
 
 // ---- module: valid_move_quest.html ----
 (function(){
-
-  const primitives = [
-    { id: 'cellEmpty', label: 'The target cell is empty' },
-    { id: 'gamePlaying', label: 'The game is still in progress' },
-    { id: 'playersTurn', label: "It matches the current player's turn" },
-    { id: 'fewerThan9', label: 'Fewer than 9 marks are on the board' },
-    { id: 'validIndex', label: 'The cell index is between 1 and 9' },
-    { id: 'firstMove', label: 'This is the first move of the game' },
+  const guards = [
+    { id:'targetOccupied', label:'Target cell is occupied', code:'board[target] is occupied', test:tc => tc.board[tc.target] !== '', why:'Rejects a move that would overwrite an existing mark.' },
+    { id:'gameFinished', label:'Game is not in progress', code:'status is not "playing"', test:tc => tc.status !== 'playing', why:'Rejects input after the game has already ended.' },
+    { id:'notFirstMove', label:'This is not the first move', code:'board already contains a mark', test:tc => tc.board.some(Boolean), why:'This would incorrectly reject almost every move after the opening turn.' },
+    { id:'centerOccupied', label:'Center cell is occupied', code:'board[4] is occupied', test:tc => tc.board[4] !== '', why:'The center can be occupied while another target cell is still perfectly valid.' },
+    { id:'playerIsO', label:'Current player is O', code:'currentPlayer === "O"', test:tc => tc.player === 'O', why:'A move does not become invalid just because O is taking the turn.' },
   ];
 
-  const evaluators = {
-    cellEmpty: tc => tc.board[tc.target] === '',
-    gamePlaying: tc => tc.status === 'playing',
-    playersTurn: () => true,
-    fewerThan9: tc => tc.board.filter(c => c !== '').length < 9,
-    validIndex: tc => tc.target >= 0 && tc.target <= 8,
-    firstMove: tc => tc.board.filter(c => c !== '').length === 0,
-  };
-
-  const CORRECT_SET = ['cellEmpty', 'gamePlaying'];
-
-  const testCases = [
-    { board: ['','','','','','','','',''], target: 4, status: 'playing', desc: "The very first move of the game." },
-    { board: ['X','','','','','','','',''], target: 4, status: 'playing', desc: "The second move, right after X went first." },
-    { board: ['X','O','','','','','','',''], target: 0, status: 'playing', desc: "An attempt to play a cell X already occupies." },
-    { board: ['X','X','X','O','O','','','',''], target: 5, status: 'won-X', desc: "X already completed the top row. Someone tries cell 6 anyway." },
-    { board: ['X','O','X','O','','','','',''], target: 4, status: 'playing', desc: "A routine move, midgame." },
-    { board: ['X','O','X','O','X','O','X','O',''], target: 8, status: 'playing', desc: "The last open cell, with the game still undecided." },
-    { board: ['X','O','X','X','O','O','O','X','X'], target: 8, status: 'draw', desc: "An attempt to play after the board already ended in a draw." },
-    { board: ['X','O','','X','O','','','',''], target: 5, status: 'playing', desc: "Another routine move, well into the game." },
+  const tests = [
+    { name:'Opening move', board:['','','','','','','','',''], target:4, status:'playing', player:'X', desc:'X selects the center on an empty board.' },
+    { name:'Second player moves', board:['X','','','','','','','',''], target:4, status:'playing', player:'O', desc:'O selects an empty center after X has moved.' },
+    { name:'Center already occupied', board:['X','','','','O','','','',''], target:8, status:'playing', player:'X', desc:'The center is occupied, but X selects a different empty cell.' },
+    { name:'Occupied target', board:['X','O','','','','','','',''], target:0, status:'playing', player:'X', desc:'X attempts board[0], which already contains X.' },
+    { name:'Move after a win', board:['X','X','X','O','O','','','',''], target:5, status:'won-X', player:'O', desc:'X has already won, but O attempts an empty cell.' },
+    { name:'Routine midgame move', board:['X','O','','','X','','O','',''], target:7, status:'playing', player:'O', desc:'O selects an ordinary empty cell during active play.' },
+    { name:'Last available square', board:['X','O','X','O','X','O','O','X',''], target:8, status:'playing', player:'X', desc:'X selects the final open square while the game is still active.' },
+    { name:'Move after a draw', board:['X','O','X','X','O','O','O','X','X'], target:8, status:'draw', player:'O', desc:'The game is already a draw and input should be rejected.' },
   ];
 
-  function expectedValid(tc) {
-    return tc.board[tc.target] === '' && tc.status === 'playing';
-  }
+  let selectedGuards=[];
+  let stagePassed=false;
+  const library=document.getElementById('vm_guardLibrary');
+  const programEl=document.getElementById('vm_program');
+  const results=document.getElementById('vm_results');
+  const countEl=document.getElementById('vm_guardCount');
+  const locked=document.getElementById('vm_lockedNote');
 
-  let ruleConditions = [];
-  let ruleOperators = [];
+  function guardById(id){ return guards.find(g=>g.id===id); }
+  function expected(tc){ return tc.board[tc.target] === '' && tc.status === 'playing'; }
 
-  const palette = document.getElementById('vm_palette');
-  const ruleArea = document.getElementById('vm_ruleArea');
-  const results = document.getElementById('vm_results');
-
-  function renderPalette() {
-    palette.innerHTML = '';
-    primitives.forEach(p => {
-      const btn = document.createElement('button');
-      btn.className = 'prim-chip';
-      btn.disabled = ruleConditions.includes(p.id);
-      btn.innerHTML = `<span>${p.label}</span><span class="plus">${btn.disabled ? '&check;' : '+'}</span>`;
-      btn.addEventListener('click', () => {
-        ruleConditions.push(p.id);
-        if (ruleConditions.length > 1) ruleOperators.push('AND');
-        renderAll();
-      });
-      palette.appendChild(btn);
-    });
-  }
-
-  function renderRule() {
-    if (ruleConditions.length === 0) {
-      ruleArea.innerHTML = '<p class="rule-empty">choose a logic block…</p>';
-      return;
+  function evaluate(tc){
+    const trace=[];
+    for(const id of selectedGuards){
+      const g=guardById(id);
+      const value=!!g.test(tc);
+      trace.push({label:g.label,value,action:value?'RETURN false':'continue'});
+      if(value) return {value:false,trace};
     }
-    ruleArea.innerHTML = '';
-    ruleConditions.forEach((id, i) => {
-      if (i > 0) {
-        const opBtn = document.createElement('button');
-        opBtn.className = 'op-toggle';
-        opBtn.textContent = ruleOperators[i - 1];
-        opBtn.addEventListener('click', () => {
-          ruleOperators[i - 1] = ruleOperators[i - 1] === 'AND' ? 'OR' : 'AND';
-          renderRule();
-        });
-        const wrap = document.createElement('div');
-        wrap.style.textAlign = 'center';
-        wrap.appendChild(opBtn);
-        ruleArea.appendChild(wrap);
-      }
-      const label = primitives.find(p => p.id === id).label;
-      const chip = document.createElement('div');
-      chip.className = 'rule-chip';
-      chip.innerHTML = `<span>${label}</span>`;
-      const rm = document.createElement('button');
-      rm.textContent = '\u00d7';
-      rm.addEventListener('click', () => {
-        const idx = ruleConditions.indexOf(id);
-        ruleConditions.splice(idx, 1);
-        ruleOperators.splice(Math.max(0, idx - 1), 1);
-        renderAll();
-      });
-      chip.appendChild(rm);
-      ruleArea.appendChild(chip);
-    });
+    trace.push({label:'No guard rejected the move',value:true,action:'RETURN true'});
+    return {value:true,trace};
   }
 
-  function renderAll() {
-    renderPalette();
-    renderRule();
+  function renderBoard(tc){
+    return `<div class="vm-debug-board">${tc.board.map((v,i)=>`<div class="vm-debug-cell ${i===tc.target?'target':''} ${v==='X'?'x':v==='O'?'o':''}"><span>${i}</span>${v||''}</div>`).join('')}</div>`;
   }
 
-  function evaluateRule(tc) {
-    if (ruleConditions.length === 0) return null;
-    let result = evaluators[ruleConditions[0]](tc);
-    for (let i = 1; i < ruleConditions.length; i++) {
-      const v = evaluators[ruleConditions[i]](tc);
-      result = ruleOperators[i - 1] === 'AND' ? (result && v) : (result || v);
-    }
-    return result;
-  }
+  function invalidate(){ if(!stagePassed) results.innerHTML=''; }
 
-  function diagnoseRule(tc) {
-    const evaluations = ruleConditions.map(id => ({
-      id, label: primitives.find(p => p.id === id).label, value: evaluators[id](tc)
-    }));
-    const expression = evaluations.map((e, i) => `${i ? ruleOperators[i - 1] + ' ' : ''}${e.label} = ${e.value ? 'true' : 'false'}`).join(' · ');
-    return expression;
-  }
-
-  function renderMiniBoard(tc) {
-    const cells = tc.board.map((val, i) => {
-      let cls = 'mini-cell';
-      if (val === 'X') cls += ' x';
-      if (val === 'O') cls += ' o';
-      if (i === tc.target) cls += ' target';
-      return `<div class="${cls}">${val}</div>`;
+  function render(){
+    library.innerHTML=guards.map(g=>{
+      const used=selectedGuards.includes(g.id);
+      return `<button type="button" class="vm-guard-btn ${used?'used':''}" data-add-guard="${g.id}" ${used||stagePassed?'disabled':''}><span><b>${g.label}</b><small>${g.code}</small></span><span class="vm-add-mark">${used?'✓':'+'}</span></button>`;
     }).join('');
-    return `<div class="mini-board">${cells}</div>`;
+
+    const rows=selectedGuards.map((id,i)=>{
+      const g=guardById(id);
+      return `<div class="vm-code-row">
+        <div class="vm-code-text"><span class="kw">if</span> (${g.code}) <span class="kw">return</span> <span class="false">false</span></div>
+        <div class="vm-row-actions">
+          <button type="button" data-move-guard="up:${i}" ${i===0||stagePassed?'disabled':''} aria-label="Move guard up">↑</button>
+          <button type="button" data-move-guard="down:${i}" ${i===selectedGuards.length-1||stagePassed?'disabled':''} aria-label="Move guard down">↓</button>
+          <button type="button" data-remove-guard="${i}" ${stagePassed?'disabled':''} aria-label="Remove guard">×</button>
+        </div>
+      </div>`;
+    }).join('');
+
+    programEl.innerHTML=`<div class="vm-code-line"><span class="kw">function</span> <span class="fn">validMove</span>(board, target, status) {</div>
+      <div class="vm-code-indent">${rows || '<div class="vm-code-empty">// no rejection guards yet</div>'}</div>
+      <div class="vm-code-indent"><span class="kw">return</span> <span class="true">true</span></div>
+      <div class="vm-code-line">}</div>`;
+    countEl.textContent=`${selectedGuards.length} guard${selectedGuards.length===1?'':'s'} defined`;
+    locked.innerHTML=stagePassed?'<div class="vm-locked-note">Implementation passed and is locked into your game build.</div>':'';
+
+    library.querySelectorAll('[data-add-guard]').forEach(btn=>btn.addEventListener('click',()=>{
+      selectedGuards.push(btn.dataset.addGuard); invalidate(); render();
+    }));
+    programEl.querySelectorAll('[data-remove-guard]').forEach(btn=>btn.addEventListener('click',()=>{
+      selectedGuards.splice(Number(btn.dataset.removeGuard),1); invalidate(); render();
+    }));
+    programEl.querySelectorAll('[data-move-guard]').forEach(btn=>btn.addEventListener('click',()=>{
+      const [dir,raw]=btn.dataset.moveGuard.split(':'); const i=Number(raw); const j=dir==='up'?i-1:i+1;
+      [selectedGuards[i],selectedGuards[j]]=[selectedGuards[j],selectedGuards[i]]; invalidate(); render();
+    }));
   }
 
-  document.getElementById('vm_runTestsBtn').addEventListener('click', () => {
-    if (ruleConditions.length === 0) {
-      results.innerHTML = '<div class="summary-banner fail"><div class="summary-head">Add at least one condition first</div></div>';
-      return;
-    }
-
-    const testResults = testCases.map(tc => {
-      const expected = expectedValid(tc);
-      const actual = evaluateRule(tc);
-      return { tc, expected, actual, pass: actual === expected };
+  function runTests(){
+    const evaluated=tests.map(tc=>{
+      const run=evaluate(tc); const exp=expected(tc);
+      return {tc,actual:run.value,expected:exp,trace:run.trace,pass:run.value===exp};
     });
-    const passCount = testResults.filter(r => r.pass).length;
-    const allPass = passCount === testCases.length;
-
-    const studentSet = new Set(ruleConditions);
-    const missing = CORRECT_SET.filter(id => !studentSet.has(id));
-    const extra = ruleConditions.filter(id => !CORRECT_SET.includes(id));
-    const usesOR = ruleOperators.includes('OR');
-
-    let structuralNote = '';
-    if (missing.length || extra.length || usesOR) {
-      const parts = [];
-      if (missing.length) parts.push(`missing <b>${missing.map(id => primitives.find(p=>p.id===id).label).join(', ')}</b>`);
-      if (extra.length) parts.push(`includes conditions that aren't actually necessary (<b>${extra.map(id => primitives.find(p=>p.id===id).label).join(', ')}</b>)`);
-      if (usesOR) parts.push(`uses <b>OR</b> somewhere, when both conditions need to hold at once`);
-      structuralNote = `<p class="structural-note">Structurally, your rule ${parts.join('; ')}.</p>`;
-    } else {
-      structuralNote = `<p class="structural-note">Structurally, this matches what a valid move actually depends on: both conditions, joined with AND.</p>`;
-    }
-
-    if (allPass) {
-      window.SYS611.rule = { conditions: ruleConditions.slice(), operators: ruleOperators.slice() };
+    const passCount=evaluated.filter(r=>r.pass).length;
+    const allPass=passCount===evaluated.length;
+    if(allPass){
+      stagePassed=true;
+      window.SYS611.rule={type:'guardClauses',guards:selectedGuards.slice()};
       window.SYS611unlock('pw');
+      render();
     }
 
-    const bannerClass = allPass ? 'pass' : 'fail';
-    const bannerHead = allPass ? `All ${testCases.length} tests passed` : `${passCount} of ${testCases.length} tests passed`;
-    const bannerSub = allPass
-      ? 'Your rule correctly separates valid moves from invalid ones across every situation we tried.'
-      : "Some of these situations broke your rule. Check the cards below marked as failed, then adjust your rule and test again.";
-    const nextLink = allPass ? '<button class="btn primary" id="vm_nextBtn" style="width:100%;margin-top:10px;">Continue to Player Won? &rsaquo;</button>' : '';
-
-    const cardsHtml = testResults.map((r, idx) => `
-      <div class="test-card ${r.pass ? 'pass' : 'fail'}">
-        ${renderMiniBoard(r.tc)}
-        <div>
-          <div class="test-desc">${r.tc.desc}</div>
-          <div class="test-verdict ${r.pass ? 'pass' : 'fail'}">
-            Expected ${r.expected ? 'valid' : 'invalid'}, your rule said ${r.actual ? 'valid' : 'invalid'}
-          </div>
-          ${r.pass ? '' : `<button class="test-detail-toggle" data-debug="vm-debug-${idx}">Why did this fail?</button><div class="test-debug" id="vm-debug-${idx}"><b>Evaluation:</b><br>${diagnoseRule(r.tc)}<br><b>Expected:</b> ${r.expected ? 'valid' : 'invalid'} · <b>Returned:</b> ${r.actual ? 'valid' : 'invalid'}</div>`}
+    const rows=evaluated.map((r,i)=>{
+      const trace=r.trace.map((step,n)=>`<div class="vm-trace-step"><span>${n+1}</span><div><b>${step.label}</b><small>${step.value?'true':'false'} → ${step.action}</small></div></div>`).join('');
+      return `<div class="vm-test-row ${r.pass?'pass':'fail'}">
+        <div class="vm-test-icon">${r.pass?'✓':'×'}</div>
+        <div><div class="vm-test-name">${r.tc.name}</div><div class="vm-test-desc">${r.tc.desc}</div><div class="vm-test-verdict">Expected <b>${r.expected?'valid':'invalid'}</b> · returned <b>${r.actual?'valid':'invalid'}</b></div>
+          ${r.pass?'':`<button type="button" class="vm-debug-toggle" data-vm-debug="${i}">Inspect counterexample</button><div class="vm-debug-detail" id="vm-debug-${i}">${renderBoard(r.tc)}<div class="vm-debug-context"><b>Attempt:</b> ${r.tc.player} → board[${r.tc.target}]<br><b>Status:</b> ${r.tc.status}</div><div class="vm-trace">${trace}</div></div>`}
         </div>
-      </div>
-    `).join('');
+      </div>`;
+    }).join('');
 
-    results.innerHTML = `
-      <div class="summary-banner ${bannerClass}">
-        <div class="summary-head">${bannerHead}</div>
-        <p>${bannerSub}</p>
-        ${structuralNote}
-        ${nextLink}
-      </div>
-      <div class="test-grid">${cardsHtml}</div>
-    `;
-    document.querySelectorAll('.test-detail-toggle').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const detail = document.getElementById(btn.dataset.debug);
-        detail.classList.toggle('open');
-        btn.textContent = detail.classList.contains('open') ? 'Hide evaluation' : 'Why did this fail?';
-      });
-    });
-    if (allPass) document.getElementById('vm_nextBtn').addEventListener('click', () => window.SYS611showScreen('pw'));
-  });
+    results.innerHTML=`<div class="vm-summary ${allPass?'pass':'fail'}"><strong>${allPass?'All stress tests passed':`${passCount} of ${evaluated.length} tests passed`}</strong><p>${allPass?'Your guard clauses reject exactly the situations that should not produce a move.':'Use the failing counterexamples to see which guard fired—or which invalid situation slipped through without being rejected.'}</p>${allPass?'<button type="button" class="vm-continue" id="vm_nextBtn">Continue to Win Rule →</button>':''}</div><div class="vm-test-list">${rows}</div>`;
+    results.querySelectorAll('[data-vm-debug]').forEach(btn=>btn.addEventListener('click',()=>{
+      const d=document.getElementById('vm-debug-'+btn.dataset.vmDebug); d.classList.toggle('open'); btn.textContent=d.classList.contains('open')?'Hide execution':'Inspect counterexample';
+    }));
+    if(allPass) document.getElementById('vm_nextBtn').addEventListener('click',()=>window.SYS611showScreen('pw'));
+  }
 
-  renderAll();
-
+  document.getElementById('vm_runTestsBtn').addEventListener('click',runTests);
+  render();
 })();
+
 
 // ---- module: player_won_quest.html ----
 (function(){
 
-  const LINES = [
-    { id: 'row0', name: 'top row', cells: [0,1,2] },
-    { id: 'row1', name: 'middle row', cells: [3,4,5] },
-    { id: 'row2', name: 'bottom row', cells: [6,7,8] },
-    { id: 'col0', name: 'left column', cells: [0,3,6] },
-    { id: 'col1', name: 'middle column', cells: [1,4,7] },
-    { id: 'col2', name: 'right column', cells: [2,5,8] },
-    { id: 'diag0', name: 'diagonal ↘', cells: [0,4,8] },
-    { id: 'diag1', name: 'diagonal ↙', cells: [2,4,6] },
+  const WINNING_LINES = [
+    { id: 'row0', name: 'Top row', cells: [0,1,2] },
+    { id: 'row1', name: 'Middle row', cells: [3,4,5] },
+    { id: 'row2', name: 'Bottom row', cells: [6,7,8] },
+    { id: 'col0', name: 'Left column', cells: [0,3,6] },
+    { id: 'col1', name: 'Middle column', cells: [1,4,7] },
+    { id: 'col2', name: 'Right column', cells: [2,5,8] },
+    { id: 'diag0', name: 'Diagonal ↘', cells: [0,4,8] },
+    { id: 'diag1', name: 'Diagonal ↙', cells: [2,4,6] },
   ];
 
-  function findWinningLine(board) {
-    for (const line of LINES) {
-      const [a, b, c] = line.cells;
-      if (board[a] && board[a] === board[b] && board[b] === board[c]) return line;
-    }
-    return null;
-  }
-
-  const testCases = [
-    { board: ['X','X','X','O','O','','','',''], desc: 'Early in the game.' },
-    { board: ['X','O','','','O','','X','O','X'], desc: 'Midgame position.' },
-    { board: ['X','O','O','','X','','','','X'], desc: 'A game with several moves played.' },
-    { board: ['','O','X','O','X','','X','','O'], desc: 'Both players have been active.' },
-    { board: ['X','O','X','O','X','O','O','X','O'], desc: 'The board just filled up.' },
-    { board: ['X','','X','O','X','','O','O','O'], desc: 'Late in the game.' },
-    { board: ['O','O','X','X','O','X','O','','X'], desc: 'A tightly contested board.' },
-    { board: ['X','','','','O','','','',''], desc: 'Only two moves have been played.' },
-  ];
-  testCases.forEach(tc => { tc.expected = findWinningLine(tc.board); });
-
-  const answers = testCases.map(() => ({ call: null, cells: new Set(), checked: false, pass: null }));
-  let current = 0;
   const lab = document.getElementById('pw_lab');
-  const summary = document.getElementById('pw_summary');
+  const results = document.getElementById('pw_results');
+  let selectedCells = [];
+  let checks = [];
+  let previewKey = null;
+  let stagePassed = false;
 
-  function sameCells(set, cells) {
-    return set.size === cells.length && cells.every(i => set.has(i));
+  function keyFor(cells) { return cells.slice().sort((a,b) => a-b).join('-'); }
+  function isCanonical(cells) { return WINNING_LINES.some(line => keyFor(line.cells) === keyFor(cells)); }
+  function lineName(cells) {
+    const found = WINNING_LINES.find(line => keyFor(line.cells) === keyFor(cells));
+    return found ? found.name : 'Not a valid winning line';
   }
 
-  function renderProgress() {
-    return `<div class="pw-progress">${testCases.map((_, i) => {
-      const a = answers[i];
-      const cls = i === current ? 'active' : a.pass === true ? 'pass' : a.pass === false ? 'fail' : '';
-      const mark = a.pass === true ? '✓' : i + 1;
-      return `<button type="button" class="${cls}" data-pw-index="${i}" aria-label="Board ${i+1}">${mark}</button>`;
-    }).join('')}</div>`;
+  function invalidateResults() {
+    if (stagePassed) return;
+    results.innerHTML = '';
   }
 
   function render() {
-    const tc = testCases[current];
-    const ans = answers[current];
-    const selectable = ans.call === 'win' && !ans.checked;
-    const answerCells = ans.checked && ans.pass === false && tc.expected ? new Set(tc.expected.cells) : new Set();
-    const cells = tc.board.map((val, i) => {
-      let cls = 'pw-cell';
-      if (val === 'X') cls += ' x';
-      if (val === 'O') cls += ' o';
-      if (selectable) cls += ' selectable';
-      if (ans.cells.has(i)) cls += ' selected';
-      if (answerCells.has(i)) cls += ' answer';
-      return `<button type="button" class="${cls}" data-cell="${i}" ${selectable ? '' : 'disabled'}>${val}</button>`;
+    const selectedKey = keyFor(selectedCells);
+    const previewCells = previewKey ? new Set(previewKey.split('-').map(Number)) : new Set();
+    const board = Array.from({length:9}, (_, i) => {
+      const selectionIndex = selectedCells.indexOf(i);
+      const cls = ['pw-index-cell'];
+      if (selectionIndex !== -1) cls.push('selected');
+      if (previewCells.has(i)) cls.push('preview');
+      return `<button type="button" class="${cls.join(' ')}" data-pw-cell="${i}" ${stagePassed ? 'disabled' : ''}>
+        <span class="pw-index-label">board[${i}]</span>
+        <span class="pw-index-num">${i}</span>
+        ${selectionIndex !== -1 ? `<span class="pw-select-order">${selectionIndex + 1}</span>` : ''}
+      </button>`;
     }).join('');
 
-    const instruction = ans.call === 'win'
-      ? `Select the three cells that form the winning line. ${ans.cells.size}/3 selected.`
-      : ans.call === 'nowin'
-        ? 'No cells need to be selected. Check the board when you are ready.'
-        : 'First decide whether this board contains a win.';
+    const list = checks.length ? checks.map((cells, i) => `
+      <div class="pw-check-row">
+        <button type="button" class="pw-check-main" data-preview-check="${keyFor(cells)}">[${cells.join(', ')}]</button>
+        <button type="button" class="pw-check-remove" data-remove-check="${i}" aria-label="Remove check [${cells.join(', ')}]" ${stagePassed ? 'disabled' : ''}>×</button>
+      </div>`).join('') : `<div class="pw-check-empty">No winning checks yet. Select three cells on the board and add the combination.</div>`;
 
-    let feedback = '';
-    if (ans.checked) {
-      if (ans.pass) {
-        feedback = `<div class="pw-feedback pass"><b>Correct.</b> ${tc.expected ? `Those three cells form the ${tc.expected.name}.` : 'There is no winning line on this board.'}</div>`;
-      } else {
-        feedback = `<div class="pw-feedback fail"><b>Not quite.</b> ${tc.expected ? `This board has a ${tc.expected.name}; the correct cells are highlighted in green.` : 'No player has three matching marks in any row, column, or diagonal.'}</div>`;
-      }
-    }
+    const selectionText = selectedCells.length
+      ? `<b>Selected:</b> [${selectedCells.join(', ')}]${selectedCells.length === 3 ? ` · ${lineName(selectedCells)}` : ''}`
+      : 'Select three cells that could form a winning line.';
 
     lab.innerHTML = `
-      <div class="pw-board-card">
-        ${renderProgress()}
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-transform:uppercase;color:var(--ink-muted);">Board ${current + 1} of ${testCases.length}</div>
-        <div class="pw-board-large">${cells}</div>
-        <div style="font-size:12.5px;color:var(--ink-muted);text-align:center;">${tc.desc}</div>
+      <div class="pw-panel">
+        <div class="pw-panel-kicker">Board index</div>
+        <h2>Define a winning line</h2>
+        <p class="pw-panel-copy">Choose three cells that your function should inspect together. Cell numbers map directly to a 0–8 board array.</p>
+        <div class="pw-index-board">${board}</div>
+        <div class="pw-selection-readout">${selectionText}</div>
+        <button type="button" class="pw-add-check" id="pw_addCheck" ${selectedCells.length !== 3 || checks.some(c => keyFor(c) === selectedKey) || stagePassed ? 'disabled' : ''}>+ Add selected check</button>
+        <p class="pw-builder-note">Add every distinct three-cell set that can produce a winner. The interface deliberately does not tell you how many checks you need.</p>
       </div>
-      <div class="pw-task-card">
-        <div style="font-family:'IBM Plex Mono',monospace;color:#0E6E90;font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;">Implement the return value</div>
-        <h2 style="font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;font-size:23px;margin-top:5px;">Does playerWon(board) return true?</h2>
-        <div class="pw-call-row">
-          <button type="button" class="pw-call-btn ${ans.call === 'nowin' ? 'selected' : ''}" data-call="nowin" ${ans.checked ? 'disabled' : ''}>No win</button>
-          <button type="button" class="pw-call-btn ${ans.call === 'win' ? 'selected' : ''}" data-call="win" ${ans.checked ? 'disabled' : ''}>There is a win</button>
+
+      <div class="pw-panel">
+        <div class="pw-panel-kicker">Visual function builder</div>
+        <h2>Your implementation</h2>
+        <div class="pw-function-shell">
+          <div class="pw-function-head"><span class="function-label">Function</span><span class="function-name">playerWon(board)</span></div>
+          <div class="pw-function-body">
+            <div class="pw-code-line"><span class="dim">const</span> winningLines = [</div>
+            <div class="pw-check-list">${list}</div>
+            <div class="pw-code-line">]</div>
+            <div class="pw-code-line" style="margin-top:8px"><span class="kw">return</span> <span class="fn">ANY</span> line where all 3 cells contain the same non-empty mark</div>
+          </div>
         </div>
-        <div class="pw-instruction">${instruction}</div>
-        <button type="button" class="pw-check" id="pw_checkCurrent" ${ans.call === null || (ans.call === 'win' && ans.cells.size !== 3) || ans.checked ? 'disabled' : ''}>Check this board</button>
-        ${feedback}
-        <div class="pw-concept"><span class="kw">return</span> <span class="fn">ANY</span> winning line where all three cells contain the same non-empty mark.</div>
-        <div class="pw-nav">
-          <button type="button" id="pw_prev" ${current === 0 ? 'disabled' : ''}>← Previous</button>
-          <button type="button" id="pw_next" ${current === testCases.length - 1 ? 'disabled' : ''}>Next →</button>
-        </div>
+        <div class="pw-check-count"><strong>Winning checks</strong><span>${checks.length} defined</span></div>
+        <button type="button" class="pw-run-tests" id="pw_runTests" ${checks.length === 0 || stagePassed ? 'disabled' : ''}>▶ Run stress tests</button>
+        ${stagePassed ? '<div class="pw-locked-note">Implementation passed and is locked into your game build.</div>' : ''}
       </div>`;
 
-    lab.querySelectorAll('[data-pw-index]').forEach(btn => btn.addEventListener('click', () => { current = Number(btn.dataset.pwIndex); render(); }));
-    lab.querySelectorAll('[data-call]').forEach(btn => btn.addEventListener('click', () => {
-      ans.call = btn.dataset.call;
-      ans.cells = new Set();
-      ans.checked = false; ans.pass = null;
+    lab.querySelectorAll('[data-pw-cell]').forEach(btn => btn.addEventListener('click', () => {
+      const i = Number(btn.dataset.pwCell);
+      previewKey = null;
+      if (selectedCells.includes(i)) selectedCells = selectedCells.filter(v => v !== i);
+      else if (selectedCells.length < 3) selectedCells.push(i);
+      invalidateResults();
       render();
     }));
-    lab.querySelectorAll('[data-cell]').forEach(btn => btn.addEventListener('click', () => {
-      const i = Number(btn.dataset.cell);
-      if (ans.cells.has(i)) ans.cells.delete(i);
-      else if (ans.cells.size < 3) ans.cells.add(i);
+
+    const add = document.getElementById('pw_addCheck');
+    if (add) add.addEventListener('click', () => {
+      if (selectedCells.length !== 3) return;
+      const normalized = selectedCells.slice();
+      if (!checks.some(c => keyFor(c) === keyFor(normalized))) checks.push(normalized);
+      selectedCells = [];
+      previewKey = keyFor(normalized);
+      invalidateResults();
+      render();
+    });
+
+    lab.querySelectorAll('[data-preview-check]').forEach(btn => btn.addEventListener('click', () => {
+      previewKey = previewKey === btn.dataset.previewCheck ? null : btn.dataset.previewCheck;
+      selectedCells = [];
       render();
     }));
-    const check = document.getElementById('pw_checkCurrent');
-    if (check) check.addEventListener('click', checkCurrent);
-    document.getElementById('pw_prev').addEventListener('click', () => { current--; render(); });
-    document.getElementById('pw_next').addEventListener('click', () => { current++; render(); });
+
+    lab.querySelectorAll('[data-remove-check]').forEach(btn => btn.addEventListener('click', () => {
+      checks.splice(Number(btn.dataset.removeCheck), 1);
+      selectedCells = [];
+      previewKey = null;
+      invalidateResults();
+      render();
+    }));
+
+    const run = document.getElementById('pw_runTests');
+    if (run) run.addEventListener('click', runStressTests);
   }
 
-  function checkCurrent() {
-    const tc = testCases[current];
-    const ans = answers[current];
-    const expectedWin = !!tc.expected;
-    const callCorrect = (ans.call === 'win') === expectedWin;
-    const cellsCorrect = !expectedWin || sameCells(ans.cells, tc.expected.cells);
-    ans.pass = callCorrect && cellsCorrect;
-    ans.checked = true;
+  function studentWon(board) {
+    return checks.some(cells => {
+      const [a,b,c] = cells;
+      return board[a] !== '' && board[a] === board[b] && board[b] === board[c];
+    });
+  }
 
-    const allPass = answers.every(a => a.pass === true);
+  function boardForLine(cells) {
+    const board = Array(9).fill('');
+    cells.forEach(i => board[i] = 'X');
+    return board;
+  }
+
+  function runStressTests() {
+    const positiveTests = WINNING_LINES.map(line => {
+      const board = boardForLine(line.cells);
+      const actual = studentWon(board);
+      return {
+        pass: actual === true,
+        name: line.name + ' win',
+        cells: line.cells,
+        detail: actual
+          ? `Your implementation recognizes the winning pattern through cells [${line.cells.join(', ')}].`
+          : `A winner through cells [${line.cells.join(', ')}] was missed. Your function needs a check that covers this line.`
+      };
+    });
+
+    const invalidChecks = checks.filter(cells => !isCanonical(cells));
+    const falsePositiveTests = invalidChecks.map(cells => {
+      const board = boardForLine(cells);
+      const actual = studentWon(board);
+      return {
+        pass: actual === false,
+        name: 'False-positive guard',
+        cells,
+        detail: actual
+          ? `[${cells.join(', ')}] does not form a row, column, or diagonal, but your implementation treats it as a win.`
+          : `The invalid combination [${cells.join(', ')}] is correctly ignored.`
+      };
+    });
+
+    const negativeBoards = [
+      ['X','X','','','O','','','',''],
+      ['X','','O','','X','','O','',''],
+      ['O','X','O','X','O','X','X','O','X'],
+    ];
+    const negativeTests = negativeBoards.map((board, i) => {
+      const actual = studentWon(board);
+      return {
+        pass: actual === false,
+        name: `No-win board ${i + 1}`,
+        cells: null,
+        detail: actual ? 'Your implementation reports a winner on a board with no valid winning line.' : 'No false winner detected.'
+      };
+    });
+
+    const suite = [...positiveTests, ...falsePositiveTests, ...negativeTests];
+    const passed = suite.filter(t => t.pass).length;
+    const allPass = suite.every(t => t.pass) && invalidChecks.length === 0;
+
     if (allPass) {
+      stagePassed = true;
       window.SYS611.playerWonPassed = true;
+      window.SYS611.winningLines = checks.map(c => c.slice());
       window.SYS611unlock('bf');
-      summary.innerHTML = `<div class="summary-banner pass"><div class="summary-head">All 8 boards recognized correctly</div><p>You can now identify wins directly from the board state.</p><button class="btn primary" id="pw_nextStage" style="width:100%;margin-top:10px;">Continue to boardFull() ›</button></div>`;
-      document.getElementById('pw_nextStage').addEventListener('click', () => window.SYS611showScreen('bf'));
-    } else {
-      const passed = answers.filter(a => a.pass === true).length;
-      summary.innerHTML = passed ? `<div class="summary-banner ${ans.pass ? 'pass' : 'fail'}"><div class="summary-head">${passed} of ${testCases.length} boards verified</div><p>${ans.pass ? 'Good. Continue through the remaining boards.' : 'Use the board itself: identify the winning pattern rather than its name.'}</p></div>` : '';
     }
-    render();
+
+    const rows = suite.map(t => `
+      <div class="pw-test-row ${t.pass ? 'pass' : 'fail'}">
+        <div class="pw-test-icon">${t.pass ? '✓' : '×'}</div>
+        <div><div class="pw-test-name">${t.name}</div><div class="pw-test-detail">${t.detail}</div></div>
+        <div class="pw-test-cells">${t.cells ? `[${t.cells.join(', ')}]` : '—'}</div>
+      </div>`).join('');
+
+    results.innerHTML = `
+      <div class="pw-test-summary ${allPass ? 'pass' : 'fail'}">
+        <strong>${allPass ? 'All stress tests passed' : `${passed} of ${suite.length} stress tests passed`}</strong>
+        <p>${allPass
+          ? 'Your playerWon() implementation covers every winning line and does not invent false winning patterns.'
+          : 'Use the failing cases below to identify missing or invalid cell sets, then revise your checks and test again.'}</p>
+        ${allPass ? '<button type="button" class="pw-continue" id="pw_continue">Continue to Draw Rule →</button>' : ''}
+      </div>
+      <div class="pw-test-list">${rows}</div>`;
+
+    if (allPass) {
+      document.getElementById('pw_continue').addEventListener('click', () => window.SYS611showScreen('bf'));
+      render();
+    }
   }
 
   render();
@@ -2060,108 +2080,123 @@ renderStepper('dg');
 
 // ---- module: board_full_quest.html ----
 (function(){
-
-  const options = [
-    { id: 'allOccupied', label: 'All 9 cells are occupied' },
-    { id: 'noWinner', label: 'There is no winner yet' },
-    { id: 'centerTaken', label: 'The center cell is occupied' },
-    { id: 'fourEach', label: 'Both players have played at least 4 moves each' },
+  const blocks=[
+    {id:'forEach',label:'FOR EACH cell IN board',code:'for each cell in board',kind:'loop'},
+    {id:'ifEmptyFalse',label:'IF cell is empty → RETURN false',code:'if cell is empty → return false',kind:'loopCheck'},
+    {id:'ifOccupiedFalse',label:'IF cell is occupied → RETURN false',code:'if cell is occupied → return false',kind:'loopCheck'},
+    {id:'ifEmptyTrue',label:'IF cell is empty → RETURN true',code:'if cell is empty → return true',kind:'loopCheck'},
+    {id:'returnTrue',label:'RETURN true',code:'return true',kind:'return'},
+    {id:'returnFalse',label:'RETURN false',code:'return false',kind:'return'},
   ];
-
-  const evaluators = {
-    allOccupied: tc => tc.board.every(c => c !== ''),
-    noWinner: tc => tc.status !== 'won-X' && tc.status !== 'won-O',
-    centerTaken: tc => tc.board[4] !== '',
-    fourEach: tc => {
-      const x = tc.board.filter(c => c === 'X').length;
-      const o = tc.board.filter(c => c === 'O').length;
-      return x >= 4 && o >= 4;
-    },
-  };
-
-  const testCases = [
-    { board: ['','','','','','','','',''], status: 'playing', desc: "The opening position." },
-    { board: ['X','O','X','','O','','','',''], status: 'playing', desc: "Partway through the game." },
-    { board: ['X','O','X','O','X','O','X','O',''], status: 'playing', desc: "One cell left to play." },
-    { board: ['X','O','X','O','O','X','O','X','O'], status: 'draw', desc: "A full board that ended without a winner." },
-    { board: ['X','X','X','O','O','X','O','X','O'], status: 'won-X', desc: "A full board where X already won earlier." },
-    { board: ['','','','','X','','','',''], status: 'playing', desc: "Only the center has been played." },
+  const tests=[
+    {name:'Empty board',board:['','','','','','','','',''],status:'playing',desc:'No cells are occupied.'},
+    {name:'Partly filled board',board:['X','O','X','','O','','','',''],status:'playing',desc:'Several cells are still empty.'},
+    {name:'One square left',board:['X','O','X','O','X','O','X','O',''],status:'playing',desc:'Only board[8] remains empty.'},
+    {name:'Full draw board',board:['X','O','X','O','O','X','O','X','O'],status:'draw',desc:'Every cell is occupied and there is no winner.'},
+    {name:'Full board with winner',board:['X','X','X','O','O','X','O','X','O'],status:'won-X',desc:'Every cell is occupied even though X has a winning line.'},
+    {name:'Only center occupied',board:['','','','','X','','','',''],status:'playing',desc:'The center is filled, but eight cells remain open.'},
   ];
+  const correctProgram=['forEach','ifEmptyFalse','returnTrue'];
+  let program=[];
+  let stagePassed=false;
+  const lib=document.getElementById('bf_blockLibrary');
+  const programEl=document.getElementById('bf_program');
+  const results=document.getElementById('bf_results');
+  const countEl=document.getElementById('bf_blockCount');
+  const locked=document.getElementById('bf_lockedNote');
 
-  function expectedFull(tc) { return tc.board.every(c => c !== ''); }
+  function blockById(id){return blocks.find(b=>b.id===id)}
+  function expected(tc){return tc.board.every(Boolean)}
 
-  let selected = null;
-
-  const optionsEl = document.getElementById('bf_options');
-  const resultsEl = document.getElementById('bf_results');
-
-  function renderOptions() {
-    optionsEl.innerHTML = '';
-    options.forEach(o => {
-      const btn = document.createElement('button');
-      btn.className = 'option' + (selected === o.id ? ' selected' : '');
-      btn.textContent = o.label;
-      btn.addEventListener('click', () => { selected = o.id; renderOptions(); });
-      optionsEl.appendChild(btn);
-    });
-  }
-
-  function renderMiniBoard(tc) {
-    const cells = tc.board.map(val => {
-      let cls = 'mini-cell';
-      if (val === 'X') cls += ' x';
-      if (val === 'O') cls += ' o';
-      return `<div class="${cls}">${val}</div>`;
-    }).join('');
-    return `<div class="mini-board">${cells}</div>`;
-  }
-
-  document.getElementById('bf_runBtn').addEventListener('click', () => {
-    if (!selected) {
-      resultsEl.innerHTML = '<div class="summary-banner fail"><div class="summary-head">Pick a definition first</div></div>';
-      return;
+  function execute(tc){
+    const trace=[]; let pc=0;
+    while(pc<program.length){
+      const id=program[pc];
+      if(id==='forEach'){
+        const body=program[pc+1];
+        if(!['ifEmptyFalse','ifOccupiedFalse','ifEmptyTrue'].includes(body)){
+          trace.push({kind:'error',text:'FOR EACH has no cell-check directly beneath it.'}); pc+=1; continue;
+        }
+        for(let i=0;i<tc.board.length;i++){
+          const value=tc.board[i]; const occupied=value!=='';
+          if(body==='ifEmptyFalse'){
+            trace.push({kind:'scan',cell:i,value:value||'EMPTY',text:`cell[${i}] ${occupied?'is occupied → continue':'is EMPTY → RETURN false'}`});
+            if(!occupied) return {value:false,trace};
+          } else if(body==='ifOccupiedFalse'){
+            trace.push({kind:'scan',cell:i,value:value||'EMPTY',text:`cell[${i}] ${occupied?'is occupied → RETURN false':'is empty → continue'}`});
+            if(occupied) return {value:false,trace};
+          } else if(body==='ifEmptyTrue'){
+            trace.push({kind:'scan',cell:i,value:value||'EMPTY',text:`cell[${i}] ${occupied?'is occupied → continue':'is EMPTY → RETURN true'}`});
+            if(!occupied) return {value:true,trace};
+          }
+        }
+        trace.push({kind:'loopDone',text:'Loop finished without returning.'}); pc+=2; continue;
+      }
+      if(['ifEmptyFalse','ifOccupiedFalse','ifEmptyTrue'].includes(id)){
+        trace.push({kind:'error',text:`${blockById(id).label} has no current cell because it is outside FOR EACH.`});
+        return {value:null,trace};
+      }
+      if(id==='returnTrue'){trace.push({kind:'return',text:'RETURN true'});return {value:true,trace};}
+      if(id==='returnFalse'){trace.push({kind:'return',text:'RETURN false'});return {value:false,trace};}
+      pc++;
     }
-    const evaluator = evaluators[selected];
-    const testResults = testCases.map(tc => {
-      const expected = expectedFull(tc);
-      const actual = evaluator(tc);
-      return { tc, expected, actual, pass: actual === expected };
-    });
-    const passCount = testResults.filter(r => r.pass).length;
-    const allPass = passCount === testCases.length;
+    trace.push({kind:'error',text:'Execution reached the end without returning a value.'});
+    return {value:null,trace};
+  }
 
-    const cardsHtml = testResults.map(r => {
-      const occupied = r.tc.board.filter(Boolean).length;
-      return `
-      <div class="test-card ${r.pass ? 'pass' : 'fail'}">
-        ${renderMiniBoard(r.tc)}
-        <div>
-          <div class="test-desc">${r.tc.desc}</div>
-          <div class="test-verdict ${r.pass ? 'pass' : 'fail'}">
-            Expected ${r.expected ? 'full' : 'not full'}, your rule said ${r.actual ? 'full' : 'not full'}
-          </div>
-          ${r.pass ? '' : `<div class="debug-line">Board state: ${occupied}/9 cells occupied. A full-board check should depend only on whether all 9 cells are occupied.</div>`}
-        </div>
-      </div>`;
+  function renderBoard(tc,trace){
+    const scanned=new Map();
+    trace.filter(t=>t.kind==='scan').forEach((t,i)=>scanned.set(t.cell,i+1));
+    return `<div class="bf-trace-board">${tc.board.map((v,i)=>`<div class="bf-trace-cell ${scanned.has(i)?'scanned':''} ${v==='X'?'x':v==='O'?'o':''}"><span class="bf-cell-index">${i}</span>${v||''}${scanned.has(i)?`<span class="bf-scan-order">${scanned.get(i)}</span>`:''}</div>`).join('')}</div>`;
+  }
+
+  function render(){
+    lib.innerHTML=blocks.map(b=>{
+      const used=program.includes(b.id);
+      return `<button type="button" class="bf-block-btn ${used?'used':''}" data-add-block="${b.id}" ${used||stagePassed?'disabled':''}><span><b>${b.label}</b><small>${b.kind==='loop'?'iteration':b.kind==='loopCheck'?'loop decision':'function return'}</small></span><span>${used?'✓':'+'}</span></button>`;
     }).join('');
 
-    if (allPass) { window.SYS611.boardFullDef = selected; window.SYS611unlock('pl'); }
-    const nextLink = allPass ? '<button class="btn primary" id="bf_nextBtn" style="width:100%;margin-top:10px;">Play the game you built &rsaquo;</button>' : '';
+    const rows=program.map((id,i)=>{
+      const b=blockById(id); const indented=i>0 && program[i-1]==='forEach' && b.kind==='loopCheck';
+      return `<div class="bf-code-row ${indented?'indented':''}"><div class="bf-code-text">${b.code}</div><div class="bf-row-actions"><button type="button" data-move-block="up:${i}" ${i===0||stagePassed?'disabled':''}>↑</button><button type="button" data-move-block="down:${i}" ${i===program.length-1||stagePassed?'disabled':''}>↓</button><button type="button" data-remove-block="${i}" ${stagePassed?'disabled':''}>×</button></div></div>`;
+    }).join('');
+    programEl.innerHTML=`<div class="bf-code-line"><span class="kw">function</span> <span class="fn">boardFull</span>(board) {</div><div class="bf-code-indent">${rows||'<div class="bf-code-empty">// add statements to build the scan</div>'}</div><div class="bf-code-line">}</div>`;
+    countEl.textContent=`${program.length} statement${program.length===1?'':'s'} defined`;
+    locked.innerHTML=stagePassed?'<div class="bf-locked-note">Implementation passed and is locked into your game build.</div>':'';
 
-    resultsEl.innerHTML = `
-      <div class="summary-banner ${allPass ? 'pass' : 'fail'}">
-        <div class="summary-head">${allPass ? 'All 6 tests passed' : passCount + ' of 6 tests passed'}</div>
-        <p>${allPass ? 'This definition correctly identifies a full board, regardless of whether anyone won.' : "This definition breaks on at least one situation below. A full board check only needs to know one thing: is every cell occupied."}</p>
-        ${nextLink}
-      </div>
-      <div class="test-grid">${cardsHtml}</div>
-    `;
-    if (allPass) document.getElementById('bf_nextBtn').addEventListener('click', () => window.SYS611showScreen('pl'));
-  });
+    lib.querySelectorAll('[data-add-block]').forEach(btn=>btn.addEventListener('click',()=>{program.push(btn.dataset.addBlock);if(!stagePassed)results.innerHTML='';render()}));
+    programEl.querySelectorAll('[data-remove-block]').forEach(btn=>btn.addEventListener('click',()=>{program.splice(Number(btn.dataset.removeBlock),1);if(!stagePassed)results.innerHTML='';render()}));
+    programEl.querySelectorAll('[data-move-block]').forEach(btn=>btn.addEventListener('click',()=>{const [dir,raw]=btn.dataset.moveBlock.split(':');const i=Number(raw),j=dir==='up'?i-1:i+1;[program[i],program[j]]=[program[j],program[i]];if(!stagePassed)results.innerHTML='';render()}));
+  }
 
-  renderOptions();
+  function runTests(){
+    const evaluated=tests.map(tc=>{const run=execute(tc),exp=expected(tc);return {tc,actual:run.value,expected:exp,trace:run.trace,pass:run.value===exp}});
+    const behaviorPass=evaluated.every(r=>r.pass);
+    const minimalPass=program.join('|')===correctProgram.join('|');
+    const allPass=behaviorPass&&minimalPass;
+    const passCount=evaluated.filter(r=>r.pass).length;
+    if(allPass){stagePassed=true;window.SYS611.boardFullProgram=program.slice();window.SYS611unlock('pl');render();}
 
+    const rows=evaluated.map((r,i)=>{
+      const trace=r.trace.map((t,n)=>`<div class="bf-trace-step ${t.kind}"><span>${n+1}</span><div>${t.text}</div></div>`).join('');
+      const actualLabel=r.actual===null?'no value':r.actual?'full':'not full';
+      return `<div class="bf-test-row ${r.pass?'pass':'fail'}"><div class="bf-test-icon">${r.pass?'✓':'×'}</div><div><div class="bf-test-name">${r.tc.name}</div><div class="bf-test-desc">${r.tc.desc}</div><div class="bf-test-verdict">Expected <b>${r.expected?'full':'not full'}</b> · returned <b>${actualLabel}</b></div><button type="button" class="bf-trace-toggle" data-bf-trace="${i}">View execution</button><div class="bf-trace-detail" id="bf-trace-${i}">${renderBoard(r.tc,r.trace)}<div class="bf-trace-list">${trace}</div></div></div></div>`;
+    }).join('');
+
+    let message='';
+    if(allPass) message='Your loop checks every cell, exits early when it finds an empty one, and returns true only after the entire scan succeeds.';
+    else if(behaviorPass&&!minimalPass) message='The example boards behave correctly, but your function still contains unnecessary, misplaced, or unreachable statements. Simplify it to the smallest clear scan before shipping.';
+    else message='Open a test trace and follow the program one statement at a time. Notice where it returns too early, inspects the wrong condition, or reaches the end without a value.';
+
+    results.innerHTML=`<div class="bf-summary ${allPass?'pass':'fail'}"><strong>${allPass?'All stress tests passed':`${passCount} of ${evaluated.length} behavioral tests passed`}</strong><p>${message}</p>${allPass?'<button type="button" class="bf-continue" id="bf_nextBtn">Run the game you built →</button>':''}</div><div class="bf-test-list">${rows}</div>`;
+    results.querySelectorAll('[data-bf-trace]').forEach(btn=>btn.addEventListener('click',()=>{const d=document.getElementById('bf-trace-'+btn.dataset.bfTrace);d.classList.toggle('open');btn.textContent=d.classList.contains('open')?'Hide execution':'View execution'}));
+    if(allPass) document.getElementById('bf_nextBtn').addEventListener('click',()=>window.SYS611showScreen('pl'));
+  }
+
+  document.getElementById('bf_runBtn').addEventListener('click',runTests);
+  render();
 })();
+
 
 // ---- module: tictactoe_play.html ----
 (function(){
@@ -2171,8 +2206,8 @@ renderStepper('dg');
     const missing = [];
     if (!window.SYS611.diagram) missing.push({ label: 'Your game-loop flow', screen: 'dg' });
     if (!window.SYS611.rule) missing.push({ label: 'Your validMove() function', screen: 'vm' });
-    if (!window.SYS611.playerWonPassed) missing.push({ label: 'Your playerWon() pattern work', screen: 'pw' });
-    if (!window.SYS611.boardFullDef) missing.push({ label: 'Your boardFull() function', screen: 'bf' });
+    if (!window.SYS611.playerWonPassed || !window.SYS611.winningLines) missing.push({ label: 'Your playerWon() winning-line checks', screen: 'pw' });
+    if (!window.SYS611.boardFullProgram) missing.push({ label: 'Your boardFull() function', screen: 'bf' });
 
     if (missing.length) {
       layout.innerHTML = `<div class="missing-card"><h2>Build is incomplete</h2><p style="font-size:13.5px;color:var(--ink-muted);">The runtime needs every earlier stage:</p><ul>${missing.map(m => `<li><a href="#" data-goto="${m.screen}">${m.label}</a></li>`).join('')}</ul></div>`;
@@ -2205,38 +2240,53 @@ renderStepper('dg');
     const layout = document.getElementById('pl_layout');
     const connections = window.SYS611.diagram.slice();
     const rule = window.SYS611.rule;
-    const boardFullDefId = window.SYS611.boardFullDef;
+    const boardFullProgram = window.SYS611.boardFullProgram.slice();
+    const winningLines = window.SYS611.winningLines.map(line => line.slice());
 
-    const validMoveEvaluators = {
-      cellEmpty: ctx => ctx.board[ctx.target] === '',
-      gamePlaying: ctx => ctx.status === 'playing',
-      playersTurn: () => true,
-      fewerThan9: ctx => ctx.board.filter(c => c !== '').length < 9,
-      validIndex: ctx => ctx.target >= 0 && ctx.target <= 8,
-      firstMove: ctx => ctx.board.filter(c => c !== '').length === 0,
+    const validGuardTests = {
+      targetOccupied: ctx => ctx.board[ctx.target] !== '',
+      gameFinished: ctx => ctx.status !== 'playing',
+      notFirstMove: ctx => ctx.board.some(Boolean),
+      centerOccupied: ctx => ctx.board[4] !== '',
+      playerIsO: ctx => ctx.currentPlayer === 'O',
     };
-    const boardFullEvaluators = {
-      allOccupied: ctx => ctx.board.every(c => c !== ''),
-      noWinner: ctx => ctx.status !== 'won-X' && ctx.status !== 'won-O',
-      centerTaken: ctx => ctx.board[4] !== '',
-      fourEach: ctx => {
-        const x = ctx.board.filter(c => c === 'X').length;
-        const o = ctx.board.filter(c => c === 'O').length;
-        return x >= 4 && o >= 4;
-      },
+    const guardLabels = {
+      targetOccupied:'target cell occupied', gameFinished:'game not in progress',
+      notFirstMove:'not first move', centerOccupied:'center occupied', playerIsO:'current player is O'
     };
 
     function evalValidMove(ctx) {
-      let result = validMoveEvaluators[rule.conditions[0]](ctx);
-      for (let i = 1; i < rule.conditions.length; i++) {
-        const v = validMoveEvaluators[rule.conditions[i]](ctx);
-        result = rule.operators[i - 1] === 'AND' ? (result && v) : (result || v);
+      const trace=[];
+      for (const id of rule.guards) {
+        const hit=!!validGuardTests[id](ctx);
+        trace.push(`${guardLabels[id]} → ${hit}`);
+        if (hit) return { value:false, trace };
       }
-      return result;
+      trace.push('no rejection guard fired → true');
+      return { value:true, trace };
     }
-    function evalBoardFull(ctx) { return boardFullEvaluators[boardFullDefId](ctx); }
-    const WIN_LINES = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-    function hasWin(board, player) { return WIN_LINES.some(line => line.every(i => board[i] === player)); }
+    function evalBoardFull(ctx) {
+      const trace=[]; let pc=0;
+      while(pc<boardFullProgram.length){
+        const id=boardFullProgram[pc];
+        if(id==='forEach'){
+          const body=boardFullProgram[pc+1];
+          for(let i=0;i<ctx.board.length;i++){
+            const occupied=ctx.board[i]!=='';
+            trace.push(`cell[${i}] ${occupied?'occupied':'empty'}`);
+            if(body==='ifEmptyFalse'&&!occupied) return {value:false,trace};
+            if(body==='ifOccupiedFalse'&&occupied) return {value:false,trace};
+            if(body==='ifEmptyTrue'&&!occupied) return {value:true,trace};
+          }
+          pc+=2; continue;
+        }
+        if(id==='returnTrue') return {value:true,trace};
+        if(id==='returnFalse') return {value:false,trace};
+        pc++;
+      }
+      return {value:false,trace};
+    }
+    function hasWin(board, player) { return winningLines.some(line => line.every(i => board[i] === player)); }
     function outgoingFrom(nodeId) { return connections.filter(c => c[0] === nodeId).map(c => c[1]); }
 
     let board, currentPlayer, status, stuckAt, runtimeLog;
@@ -2246,7 +2296,9 @@ renderStepper('dg');
       const opts = outgoingFrom(nodeId);
       if (opts.length === 0) return null;
       if (nodeId === 'validMove') {
-        const value = evalValidMove(ctx);
+        const run = evalValidMove(ctx);
+        run.trace.forEach(t => log('detail', `↳ ${t}`));
+        const value = run.value;
         log('decision', `validMove() → <span class="${value ? 'true' : 'false'}">${value}</span>`);
         const desired = value ? 'place' : 'accept';
         return opts.includes(desired) ? desired : null;
@@ -2258,7 +2310,9 @@ renderStepper('dg');
         return opts.includes(desired) ? desired : null;
       }
       if (nodeId === 'checkDraw') {
-        const value = evalBoardFull(ctx);
+        const run = evalBoardFull(ctx);
+        run.trace.forEach(t => log('detail', `↳ ${t}`));
+        const value = run.value;
         log('decision', `boardFull() → <span class="${value ? 'true' : 'false'}">${value}</span>`);
         const desired = value ? 'recordDraw' : 'switchPlayer';
         return opts.includes(desired) ? desired : null;
